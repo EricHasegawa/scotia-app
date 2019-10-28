@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.R;
 
 import java.util.ArrayList;
@@ -26,9 +27,14 @@ public class InvoicesFragment extends Fragment {
      */
     private ArrayList<View> invoices = new ArrayList<>();
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        new InvoicesFetcher().execute("");
+    }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        invoicesViewModel =
                 ViewModelProviders.of(this).get(InvoicesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
@@ -44,11 +50,11 @@ public class InvoicesFragment extends Fragment {
     /**
      * Parse raw JSON invoice data and populate invoices with the created invoices.
      *
-     * @param rawJSON The JSON array of invoices to parse and populate scrollView with,
+     * @param rawJson The JSON array of invoices to parse and populate scrollView with,
      */
-    private void loadInvoices(String rawJSON) {
+    private void loadInvoices(String rawJson) {
         try {
-            JSONObject jsonObject = new JSONObject(rawJSON);
+            JSONObject jsonObject = new JSONObject(rawJson);
             JSONArray jsonArray = jsonObject.getJSONArray("invoices");
             for (int i = 0; i < jsonArray.length(); i++) {
                 invoices.add(createView(jsonArray.getJSONObject(i)));
@@ -69,6 +75,18 @@ public class InvoicesFragment extends Fragment {
      */
     private TextView createView(JSONObject jsonObjectInvoice) {
         return new TextView(getContext());
+    }
+
+    /**
+     * Extend DataFetcher class and override onPostExecute to update this fragment once the invoices
+     * are retrieved from the database.
+     *
+     */
+    static private class InvoicesFetcher extends DataFetcher {
+        @Override
+        protected void onPostExecute(ArrayList<String> rawJsons) {
+            //populate the scollview with info obtained from rawJsons
+        }
     }
 
 }

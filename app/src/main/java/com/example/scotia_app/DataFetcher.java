@@ -39,7 +39,6 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
     @Override
     protected ArrayList<String> doInBackground(String... urlStrs) {
         ArrayList<String> rawJsonStrings = new ArrayList<>();
-
         HttpURLConnection connection = null;
         try {
             URL url;
@@ -73,14 +72,13 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
     abstract protected void onPostExecute(ArrayList<String> rawJsons);
 
     /**
-     * Helper method for getJson, creates a reader and builds a string out of the HTTP response for
-     * the given connection.
+     * Helper method for doInBackground, creates a reader and builds a string out of the HTTP
+     * response for the given connection.
      *
      * @param connection The connection with the HTTP response we are reading.
      * @return The HTTP response for the given connection in String form.
      */
     private String fetchText(HttpURLConnection connection) {
-
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder response = new StringBuilder();
@@ -95,7 +93,6 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
             e.printStackTrace();
         }
         return null;
-
     }
 
     /**

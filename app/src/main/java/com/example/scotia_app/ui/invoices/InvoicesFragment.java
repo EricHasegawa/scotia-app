@@ -23,7 +23,7 @@ import org.json.*;
 
 public class InvoicesFragment extends Fragment {
 
-    private InvoicesViewModel invoicesViewModel;
+    private InvoicesViewModel invoicesViewModel = new InvoicesViewModel();
 
     /**
      * A List of Views corresponding to invoice previews to populate the invoice page's ScrollView.
@@ -33,12 +33,12 @@ public class InvoicesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new InvoicesFetcher(this.getActivity()).execute("");
+        new InvoicesFetcher(this.getActivity()).execute("https://us-central1-scotiabank-app.cloudfunctions.net/get-invoice?id=dRBR6lGwA24VpUNcWW3k");
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-                ViewModelProviders.of(this).get(InvoicesViewModel.class);
+        ViewModelProviders.of(this).get(InvoicesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
         invoicesViewModel.getText().observe(this, new Observer<String>() {
@@ -75,12 +75,12 @@ public class InvoicesFragment extends Fragment {
                 ArrayList<JSONObject> invoices = new ArrayList<>();
                 for (String rawJson : rawJsons) {
                     JSONObject jsonObject = new JSONObject(rawJson);
-                    String id = jsonObject.getString("invoice_id");
-                    String status = jsonObject.getString("status");
                     invoices.add(jsonObject);
                 }
                 return invoices;
             } catch (org.json.JSONException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e) {
                 e.printStackTrace();
             }
             return null;

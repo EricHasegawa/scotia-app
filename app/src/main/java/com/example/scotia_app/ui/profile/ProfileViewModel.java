@@ -1,4 +1,4 @@
-package com.example.scotia_app.ui.home;
+package com.example.scotia_app.ui.profile;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -13,7 +13,7 @@ public class ProfileViewModel extends ViewModel {
         mText.setValue("This is profile fragment");
     }
 
-    public LiveData<String> getText() {
+    LiveData<String> getText() {
         return mText;
     }
 }

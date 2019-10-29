@@ -1,9 +1,11 @@
 package com.example.scotia_app.ui.invoices;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -16,6 +18,7 @@ import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.R;
 
 import java.util.ArrayList;
+
 import org.json.*;
 
 public class InvoicesFragment extends Fragment {
@@ -25,12 +28,12 @@ public class InvoicesFragment extends Fragment {
     /**
      * A List of Views corresponding to invoice previews to populate the invoice page's ScrollView.
      */
-    private ArrayList<View> invoices = new ArrayList<>();
+    private static ArrayList<JSONObject> invoices = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new InvoicesFetcher().execute("");
+        new InvoicesFetcher(this.getActivity()).execute("");
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -48,44 +51,61 @@ public class InvoicesFragment extends Fragment {
     }
 
     /**
-     * Parse raw JSON invoice data and populate invoices with the created invoices.
-     *
-     * @param rawJson The JSON array of invoices to parse and populate scrollView with,
-     */
-    private void loadInvoices(String rawJson) {
-        try {
-            JSONObject jsonObject = new JSONObject(rawJson);
-            JSONArray jsonArray = jsonObject.getJSONArray("invoices");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                invoices.add(createView(jsonArray.getJSONObject(i)));
-            }
-        }
-        catch (JSONException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
-     * Given jsonObjectInvoice, a JSONObject containing data for a single invoice, constructs an
-     * appropriate View to be displayed within scrollView.
-     *
-     * @param jsonObjectInvoice A single invoice, in form of a JSONObject.
-     * @return A TextView containing some of the invoice's data to be displayed on this invoice
-     * preview.
-     */
-    private TextView createView(JSONObject jsonObjectInvoice) {
-        return new TextView(getContext());
-    }
-
-    /**
-     * Extend DataFetcher class and override onPostExecute to update this fragment once the invoices
-     * are retrieved from the database.
-     *
+     * Fetches and parses the invoice data for some collection of urls.
      */
     static private class InvoicesFetcher extends DataFetcher {
+
+        /**
+         * Initialize a new InvoicesFetcher, which runs in the given context.
+         *
+         * @param context The context in which this InvoicesFetcher runs.
+         */
+        InvoicesFetcher(Activity context) {
+            super(context);
+        }
+
+        /**
+         * Return a list of JSONObjects with which to populate invoices.
+         *
+         * @param rawJsons The ArrayList of raw json strings to be parsed.
+         * @return A List of JSONObjects, each corresponding to a raw json string.
+         */
+        private ArrayList<JSONObject> createJSONObjects(ArrayList<String> rawJsons) {
+            try {
+                ArrayList<JSONObject> invoices = new ArrayList<>();
+                for (String rawJson : rawJsons) {
+                    JSONObject jsonObject = new JSONObject(rawJson);
+                    String id = jsonObject.getString("invoice_id");
+                    String status = jsonObject.getString("status");
+                    invoices.add(jsonObject);
+                }
+                return invoices;
+            } catch (org.json.JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        /**
+         * After super.doInBackground is finished executing, store the JSONObjects corresponding to
+         * the raw strings in rawJsons in invoices, and populate the ListView with formatted strings
+         * with each invoice's ID and order status.
+         *
+         * @param rawJsons The list of raw json strings to be parsed and used in the UI.
+         */
         @Override
         protected void onPostExecute(ArrayList<String> rawJsons) {
-            //populate the scollview with info obtained from rawJsons
+            invoices = createJSONObjects(rawJsons);
+            ArrayList<String> invoiceJsons = new ArrayList<>();
+            for (JSONObject invoice : invoices) {
+                try {
+                    invoiceJsons.add("ID: " + invoice.getString("invoice_id") + "Status: " + invoice.getString("status"));
+                } catch (org.json.JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(super.getActivityWeakReference().get(), android.R.layout.simple_list_item_1, invoiceJsons);
+            //Adapt ListView with arrayAdapter
         }
     }
 

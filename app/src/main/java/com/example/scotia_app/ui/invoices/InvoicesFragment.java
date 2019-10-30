@@ -25,7 +25,7 @@ import org.json.*;
 public class InvoicesFragment extends Fragment {
 
     private String invoicesUrl = "https://us-central1-scotiabank-app.cloudfunctions.net/" +
-            "get-invoices-by-user-id?" + "id=aaaaaa&type=customer";
+            "get-invoices-by-user-id?";
     private InvoicesViewModel invoicesViewModel = new InvoicesViewModel();
     private User user;
 
@@ -39,9 +39,18 @@ public class InvoicesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+
+        // Gets the selected user
+        if (bundle != null) {
+            this.user = bundle.getParcelable("user");
+            assert this.user != null;
+            this.invoicesUrl += "id=" + this.user.getId() + "&type=" + this.user.getPersonaType();
+        } else {
+            this.invoicesUrl += "id=placeholderId&type=customer";
+        }
+
         new InvoicesFetcher(this.getActivity()).execute(invoicesUrl);
-        this.user = (User) getArguments().get("user");
-//        this.invoicesUrl += "id=" + user.getId() + "&type=" + user.getPersonaType();
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,

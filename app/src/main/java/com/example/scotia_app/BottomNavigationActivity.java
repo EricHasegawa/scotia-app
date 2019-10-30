@@ -1,22 +1,32 @@
 package com.example.scotia_app;
 
 import android.os.Bundle;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavArgument;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.NavGraph;
+import androidx.navigation.NavInflater;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 public class BottomNavigationActivity extends AppCompatActivity {
 
+    private User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bottom_navigation);
-        getIntent().getParcelableExtra("user");
+
+        // Retrieves the current user, passed from the MainActivity
+        this.user = getIntent().getParcelableExtra("user");
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -24,8 +34,40 @@ public class BottomNavigationActivity extends AppCompatActivity {
                 R.id.navigation_invoices, R.id.navigation_notifications, R.id.navigation_profile)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+
+        setNavGraph(navController);
+
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
     }
 
+    /**
+     * Helper method to onCreate which sets the navigation controller's nav graph
+     */
+    private void setNavGraph(NavController navController) {
+        NavInflater navInflater = navController.getNavInflater();
+        NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
+
+        passUserToAllFragments(navGraph, navController);
+
+        navGraph.setStartDestination(R.id.navigation_invoices);
+        navController.setGraph(navGraph);
+    }
+
+    /**
+     * Helper method to setNavGraph which passes the current user to all the fragments and also
+     * passes the user again whenever the destination is changed since the selected fragment is
+     * recreated on each destination change
+     */
+    private void passUserToAllFragments(NavGraph navGraph, NavController navController) {
+        final NavArgument userArgument = new NavArgument.Builder().setDefaultValue(user).build();
+        navGraph.addArgument("user", userArgument);
+
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+                destination.addArgument("user", userArgument);
+            }
+        });
+    }
 }

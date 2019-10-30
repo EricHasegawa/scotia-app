@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_invoices">
+    tools:ignore="InvalidNavigation,UnusedNavigation">
 
     <fragment
         android:id="@+id/navigation_invoices"
         android:name="com.example.scotia_app.ui.invoices.InvoicesFragment"
         android:label="@string/title_invoices"
         tools:layout="@layout/fragment_invoices" >
-        <argument
-            android:name="user"
-            app:argType="com.example.scotia_app.User" />
     </fragment>
 
     <fragment
@@ -20,9 +16,6 @@
         android:name="com.example.scotia_app.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" >
-        <argument
-            android:name="user"
-            app:argType="com.example.scotia_app.User" />
     </fragment>
 
     <fragment
@@ -30,8 +23,5 @@
         android:name="com.example.scotia_app.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" >
-        <argument
-            android:name="user"
-            app:argType="com.example.scotia_app.User" />
     </fragment>
 </navigation>

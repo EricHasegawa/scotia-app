@@ -1,4 +1,4 @@
-package com.example.scotia_app.ui.home;
+package com.example.scotia_app.ui.profile;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

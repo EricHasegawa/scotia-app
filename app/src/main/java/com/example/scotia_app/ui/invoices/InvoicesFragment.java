@@ -1,6 +1,7 @@
 package com.example.scotia_app.ui.invoices;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.DataFetcher;
+import com.example.scotia_app.Invoice;
+import com.example.scotia_app.MainActivity;
 import com.example.scotia_app.R;
 import com.example.scotia_app.User;
 
@@ -57,18 +60,27 @@ public class InvoicesFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         ViewModelProviders.of(this).get(InvoicesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_invoices, container, false);
+        configureShowDetailedInvoiceWhenTapped(root);
+        return root;
+    }
+
+    private void configureShowDetailedInvoiceWhenTapped(View root) {
         final ListView listView = root.findViewById(R.id.invoices_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                /*Intent intent = new Intent(this, *detailed invoice activity*)
-                  JSONObject invoice = invoices.getJSONObject(position);
-                  intent.putExtra(invoice);
-                  startActivity(intent);
-                 */
+//                Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
+//                Invoice invoice = null;
+//                try {
+//                    invoice = new Invoice(invoices.getJSONObject(position));
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                showDetailedInvoice.putExtra("invoice", invoice);
+//                showDetailedInvoice.putExtra("user", user);
+//                startActivity(showDetailedInvoice);
             }
         });
-        return root;
     }
 
     /**

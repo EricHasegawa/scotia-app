@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.ListView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.DataFetcher;
@@ -23,35 +23,43 @@ import org.json.*;
 
 public class InvoicesFragment extends Fragment {
 
+    private static String invoicesUrl = "https://us-central1-scotiabank-app.cloudfunctions.net/get-invoice?id=dRBR6lGwA24VpUNcWW3k";
+
     private InvoicesViewModel invoicesViewModel = new InvoicesViewModel();
 
     /**
      * A List of Views corresponding to invoice previews to populate the invoice page's ScrollView.
      */
-    private static ArrayList<JSONObject> invoices = new ArrayList<>();
+    private static JSONArray invoices = new JSONArray();
+
+    private static ArrayAdapter<String> adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new InvoicesFetcher(this.getActivity()).execute("https://us-central1-scotiabank-app.cloudfunctions.net/get-invoice?id=dRBR6lGwA24VpUNcWW3k");
+        new InvoicesFetcher(this.getActivity()).execute(invoicesUrl);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ViewModelProviders.of(this).get(InvoicesViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_profile, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        invoicesViewModel.getText().observe(this, new Observer<String>() {
+        View root = inflater.inflate(R.layout.fragment_invoices, container, false);
+        final ListView listView = root.findViewById(R.id.invoices_list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                /*Intent intent = new Intent(this, *detailed invoice activity*)
+                  JSONObject invoice = invoices.getJSONObject(position);
+                  intent.putExtra(invoice);
+                  startActivity(intent);
+                 */
             }
         });
         return root;
     }
 
     /**
-     * Fetches and parses the invoice data for some collection of urls.
+     * Fetches and parses the invoice data for some collection of invoicesUrl.
      */
     static private class InvoicesFetcher extends DataFetcher {
 
@@ -67,20 +75,13 @@ public class InvoicesFragment extends Fragment {
         /**
          * Return a list of JSONObjects with which to populate invoices.
          *
-         * @param rawJsons The ArrayList of raw json strings to be parsed.
+         * @param rawJson The raw json string to be parsed
          * @return A List of JSONObjects, each corresponding to a raw json string.
          */
-        private ArrayList<JSONObject> createJSONObjects(ArrayList<String> rawJsons) {
+        private JSONArray createJSONObjects(String rawJson) {
             try {
-                ArrayList<JSONObject> invoices = new ArrayList<>();
-                for (String rawJson : rawJsons) {
-                    JSONObject jsonObject = new JSONObject(rawJson);
-                    invoices.add(jsonObject);
-                }
-                return invoices;
+                return new JSONArray(rawJson);
             } catch (org.json.JSONException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
                 e.printStackTrace();
             }
             return null;
@@ -95,17 +96,24 @@ public class InvoicesFragment extends Fragment {
          */
         @Override
         protected void onPostExecute(ArrayList<String> rawJsons) {
-            invoices = createJSONObjects(rawJsons);
+            invoices = createJSONObjects(rawJsons.get(0));
             ArrayList<String> invoiceJsons = new ArrayList<>();
-            for (JSONObject invoice : invoices) {
+            for (int i = 0; i < invoices.length(); i++) {
                 try {
-                    invoiceJsons.add("ID: " + invoice.getString("invoice_id") + "Status: " + invoice.getString("status"));
+                    invoiceJsons.add(
+                            "ID: " +
+                                    invoices.getJSONObject(i).getString("invoice_id") +
+                                    " Status: " +
+                                    invoices.getJSONObject(i).getString("status"));
                 } catch (org.json.JSONException e) {
                     e.printStackTrace();
                 }
             }
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(super.getActivityWeakReference().get(), android.R.layout.simple_list_item_1, invoiceJsons);
-            //Adapt ListView with arrayAdapter
+            AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
+            ListView listView = context.findViewById(R.id.invoices_list);
+            listView.setAdapter(InvoicesFragment.adapter);
+            InvoicesFragment.adapter = new ArrayAdapter<>(super.getActivityWeakReference().get(), android.R.layout.simple_list_item_1, invoiceJsons);
+            InvoicesFragment.adapter.notifyDataSetChanged();
         }
     }
 

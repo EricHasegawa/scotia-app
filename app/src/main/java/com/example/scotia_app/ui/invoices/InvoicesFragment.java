@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.R;
+import com.example.scotia_app.User;
 
 import java.util.ArrayList;
 
@@ -23,9 +24,10 @@ import org.json.*;
 
 public class InvoicesFragment extends Fragment {
 
-    private static String invoicesUrl = "https://us-central1-scotiabank-app.cloudfunctions.net/get-invoice?id=dRBR6lGwA24VpUNcWW3k";
-
+    private String invoicesUrl = "https://us-central1-scotiabank-app.cloudfunctions.net/" +
+            "get-invoices-by-user-id?" + "id=aaaaaa&type=customer";
     private InvoicesViewModel invoicesViewModel = new InvoicesViewModel();
+    private User user;
 
     /**
      * A List of Views corresponding to invoice previews to populate the invoice page's ScrollView.
@@ -38,6 +40,8 @@ public class InvoicesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new InvoicesFetcher(this.getActivity()).execute(invoicesUrl);
+        this.user = (User) getArguments().get("user");
+//        this.invoicesUrl += "id=" + user.getId() + "&type=" + user.getPersonaType();
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -112,7 +116,8 @@ public class InvoicesFragment extends Fragment {
             AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
             ListView listView = context.findViewById(R.id.invoices_list);
             listView.setAdapter(InvoicesFragment.adapter);
-            InvoicesFragment.adapter = new ArrayAdapter<>(super.getActivityWeakReference().get(), android.R.layout.simple_list_item_1, invoiceJsons);
+            InvoicesFragment.adapter = new ArrayAdapter<>(super.getActivityWeakReference().get(),
+                    android.R.layout.simple_list_item_1, invoiceJsons);
             InvoicesFragment.adapter.notifyDataSetChanged();
         }
     }

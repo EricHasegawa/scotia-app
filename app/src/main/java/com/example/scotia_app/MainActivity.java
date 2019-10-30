@@ -9,6 +9,10 @@ import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -24,14 +28,23 @@ public class MainActivity extends AppCompatActivity {
         spinnerListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         personaSelectorSpinner.setAdapter(spinnerListAdapter);
 
+        final User[] selectorToUserDictionary = new User[5];
+        selectorToUserDictionary[0] = new User("CocaCola", Persona.supplier, "jQFoXa2X7NriramADeph");
+        selectorToUserDictionary[1] = new User("Great Tate", Persona.driver, "6sO5KTFPxBPTCioYbHiA");
+        selectorToUserDictionary[2] = new User("Meric Gertler", Persona.driver, "ovIUOGDZGvvVVWUi70WS");
+        selectorToUserDictionary[3] = new User("Antoine's Convenience Store", Persona.customer, "EXsF6CM1WxoVNPS9CmfJ");
+        selectorToUserDictionary[4] = new User("Parsa's Store", Persona.customer, "XU4PSNljqjhgRg72c4dV");
+
         Button startAppButton = (Button) findViewById(R.id.startAppButton);
         startAppButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent switchToBottomNavigationView = new Intent(MainActivity.this,
                         BottomNavigationActivity.class);
-                String selectedPersona = (String) personaSelectorSpinner.getSelectedItem();
-                switchToBottomNavigationView.putExtra("user", selectedPersona);
+
+                int selectedPersona = personaSelectorSpinner.getSelectedItemPosition();
+                switchToBottomNavigationView.putExtra("user", selectorToUserDictionary[selectedPersona]);
+
                 startActivity(switchToBottomNavigationView);
             }
         });

@@ -1,6 +1,17 @@
 <resources>
     <string name="app_name">Scotia-App</string>
+    <string name="title_persona_selector">Select Persona</string>
     <string name="title_invoices">Invoices</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_profile">Profile</string>
+    <string name="title_activity_bottom_navigation">BottomNavigationActivity</string>
+    <string name="button_persona_selector">Please select your persona!</string>
+    <string name="button_start_app">Start App</string>
+    <string-array name="personaList">
+        <item>Coca-Cola</item>
+        <item>Driver One</item>
+        <item>Driver Two</item>
+        <item>Customer One</item>
+        <item>Customer Two</item>
+    </string-array>
 </resources>

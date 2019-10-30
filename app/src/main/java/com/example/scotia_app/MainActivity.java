@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent switchToBottomNavigationView = new Intent(MainActivity.this,
                         BottomNavigationActivity.class);
+                String selectedPersona = (String) personaSelectorSpinner.getSelectedItem();
+                switchToBottomNavigationView.putExtra("user", selectedPersona);
                 startActivity(switchToBottomNavigationView);
             }
         });

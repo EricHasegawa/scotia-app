@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/navigation_invoices"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@drawable/ic_view_list_black_24dp"
         android:title="@string/title_invoices" />
 
     <item
@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/navigation_profile"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@drawable/ic_person_black_24dp"
         android:title="@string/title_profile" />
     
 </menu>

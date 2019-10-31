@@ -15,4 +15,5 @@
         <item>Parsa\'s Store (Customer)</item>
     </string-array>
     <string name="notification_placeholder">Notifications will be configured for phase 2.</string>
+    <string name="title_activity_detailed_invoice">DetailedInvoiceActivity</string>
 </resources>

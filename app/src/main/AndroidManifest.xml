@@ -13,8 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ui.invoices.DetailedInvoiceActivity"
+            android:label="@string/title_activity_detailed_invoice"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".BottomNavigationActivity"
-            android:label="@string/title_activity_bottom_navigation"></activity>
+            android:label="@string/title_activity_bottom_navigation" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_persona_selector">

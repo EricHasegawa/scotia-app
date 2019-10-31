@@ -135,7 +135,9 @@ public class InvoicesFragment extends Fragment {
             }
             AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
             ListView listView = context.findViewById(R.id.invoices_list);
-            listView.setAdapter(InvoicesFragment.adapter);
+            if (listView != null) {
+                listView.setAdapter(InvoicesFragment.adapter);
+            }
             InvoicesFragment.adapter = new ArrayAdapter<>(super.getActivityWeakReference().get(),
                     android.R.layout.simple_list_item_1, invoiceJsons);
             InvoicesFragment.adapter.notifyDataSetChanged();

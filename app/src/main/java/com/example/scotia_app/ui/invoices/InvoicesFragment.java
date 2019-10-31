@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.Invoice;
-import com.example.scotia_app.MainActivity;
 import com.example.scotia_app.R;
 import com.example.scotia_app.User;
 

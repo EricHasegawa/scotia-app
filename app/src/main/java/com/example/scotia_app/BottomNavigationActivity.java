@@ -27,24 +27,16 @@ public class BottomNavigationActivity extends AppCompatActivity {
         // Retrieves the current user, passed from the MainActivity
         this.user = getIntent().getParcelableExtra("user");
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_invoices, R.id.navigation_notifications, R.id.navigation_profile)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-
-        setNavGraph(navController);
-
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
+        setNavGraph();
     }
 
     /**
      * Helper method to onCreate which sets the navigation controller's nav graph
      */
-    private void setNavGraph(NavController navController) {
+    private void setNavGraph() {
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+
         NavInflater navInflater = navController.getNavInflater();
         NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
 
@@ -52,6 +44,15 @@ public class BottomNavigationActivity extends AppCompatActivity {
 
         navGraph.setStartDestination(R.id.navigation_invoices);
         navController.setGraph(navGraph);
+
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_invoices, R.id.navigation_notifications, R.id.navigation_profile)
+                .build();
+
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
     }
 
     /**
@@ -59,7 +60,7 @@ public class BottomNavigationActivity extends AppCompatActivity {
      * passes the user again whenever the destination is changed since the selected fragment is
      * recreated on each destination change
      */
-    private void passUserToAllFragments(NavGraph navGraph, NavController navController) {
+    private void passUserToAllFragments(NavGraph navGraph, final NavController navController) {
         final NavArgument userArgument = new NavArgument.Builder().setDefaultValue(user).build();
         navGraph.addArgument("user", userArgument);
 

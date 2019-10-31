@@ -9,6 +9,12 @@ public class User implements Parcelable {
     private Persona mPersonaType;
     private String mId;
 
+    User(String name, Persona personaType, String id) {
+        this.mName = name;
+        this.mPersonaType = personaType;
+        this.mId = id;
+    }
+
     private User(Parcel in) {
         mName = in.readString();
         mPersonaType = Persona.valueOf(in.readString());
@@ -52,11 +58,6 @@ public class User implements Parcelable {
         this.mId = id;
     }
 
-    User(String name, Persona personaType, String id) {
-        this.mName = name;
-        this.mPersonaType = personaType;
-        this.mId = id;
-    }
 
     @Override
     public int describeContents() {

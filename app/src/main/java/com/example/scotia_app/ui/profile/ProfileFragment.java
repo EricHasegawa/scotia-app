@@ -9,10 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.R;
+import com.example.scotia_app.User;
 
 public class ProfileFragment extends Fragment {
 
@@ -23,13 +23,15 @@ public class ProfileFragment extends Fragment {
         profileViewModel =
                 ViewModelProviders.of(this).get(ProfileViewModel.class);
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
-        final TextView textView = root.findViewById(R.id.text_profile);
-        profileViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+        Bundle bundle = getArguments();
+
+        if (bundle != null) {
+            User user = getArguments().getParcelable("user");
+            final TextView textView = root.findViewById(R.id.text_profile);
+            textView.append("Hello, " + user.getName() + "!");
+        }
+
         return root;
     }
+
 }

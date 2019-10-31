@@ -14,4 +14,5 @@
         <item>Antoine\'s Convenience Store (Customer)</item>
         <item>Parsa\'s Store (Customer)</item>
     </string-array>
+    <string name="notification_placeholder">Notifications will be configured for phase 2.</string>
 </resources>

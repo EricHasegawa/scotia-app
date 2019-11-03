@@ -68,16 +68,16 @@ public class InvoicesFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
-//                Invoice invoice = null;
-//                try {
-//                    invoice = new Invoice(invoices.getJSONObject(position));
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                showDetailedInvoice.putExtra("invoice", invoice);
-//                showDetailedInvoice.putExtra("user", user);
-//                startActivity(showDetailedInvoice);
+                Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
+                Invoice invoice = null;
+                try {
+                    invoice = new Invoice(invoices.getJSONObject(position));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                showDetailedInvoice.putExtra("invoice", invoice);
+                showDetailedInvoice.putExtra("user", user);
+                startActivity(showDetailedInvoice);
             }
         });
     }

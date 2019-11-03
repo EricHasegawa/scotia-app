@@ -42,7 +42,7 @@ public class BottomNavigationActivity extends AppCompatActivity {
 
         passUserToAllFragments(navGraph, navController);
 
-        navGraph.setStartDestination(R.id.navigation_invoices);
+        navGraph.setStartDestination(R.id.navigation_notifications);
         navController.setGraph(navGraph);
 
         // Passing each menu ID as a set of Ids because each

@@ -31,6 +31,7 @@ public class Invoice implements Parcelable  {
         driver_id   = in.readString();
         status      = in.readString();
         total       = in.readString();
+        orders = new ArrayList<>();
         in.readStringList(orders);
     }
 
@@ -47,6 +48,7 @@ public class Invoice implements Parcelable  {
             this.status = invoiceData.getString("status");
             this.total = invoiceData.getString("total");
             JSONArray array = invoiceData.getJSONArray("orders");
+            orders = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
                 this.orders.add(array.getString(i));
             }

@@ -7,9 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.R;
@@ -27,11 +25,15 @@ public class ProfileFragment extends Fragment {
 
         // Sets the textview's text to the user's name if the user is not null
         Bundle bundle = getArguments();
+        final TextView textView = root.findViewById(R.id.text_profile);
         if (bundle != null) {
-            User user = getArguments().getParcelable("user");
-            final TextView textView = root.findViewById(R.id.text_profile);
+            textView.clearComposingText();
+            User user = bundle.getParcelable("user");
             assert user != null;
             textView.append("Hello, " + user.getName() + "!");
+        } else {
+            textView.clearComposingText();
+            textView.append("Please press on \"Profile\" again.");
         }
 
         return root;

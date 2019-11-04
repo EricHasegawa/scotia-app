@@ -35,14 +35,12 @@ public class InvoicesFragment extends Fragment {
      */
     private static JSONArray invoices = new JSONArray();
 
-    private static ArrayAdapter<String> adapter;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
 
         // Gets the selected user
+        Bundle bundle = getArguments();
         if (bundle != null) {
             this.user = bundle.getParcelable("user");
             assert this.user != null;
@@ -54,6 +52,7 @@ public class InvoicesFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         ViewModelProviders.of(this).get(InvoicesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_invoices, container, false);
+
         configureShowDetailedInvoiceWhenTapped(root);
         return root;
     }
@@ -135,11 +134,12 @@ public class InvoicesFragment extends Fragment {
 
             ListView listView = context.findViewById(R.id.invoices_list);
             if (listView != null) {
-                listView.setAdapter(InvoicesFragment.adapter);
+                ArrayAdapter<String> invoicesAdapter = new ArrayAdapter<>
+                        (super.getActivityWeakReference().get(),
+                        android.R.layout.simple_list_item_1, invoiceJsons);
+                listView.setAdapter(invoicesAdapter);
+                invoicesAdapter.notifyDataSetChanged();
             }
-            InvoicesFragment.adapter = new ArrayAdapter<>(super.getActivityWeakReference().get(),
-                    android.R.layout.simple_list_item_1, invoiceJsons);
-            InvoicesFragment.adapter.notifyDataSetChanged();
         }
     }
 

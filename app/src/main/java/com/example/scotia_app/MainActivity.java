@@ -132,13 +132,19 @@ public class MainActivity extends AppCompatActivity {
 
             int selectedPersona = personaSelectorSpinner.getSelectedItemPosition();
 
-            final User[] selectorToUser = new User[5];
-            selectorToUser[0] = new Supplier(userData);
-            selectorToUser[1] = new Driver(userData);
-            selectorToUser[2] = new Driver(userData);
-            selectorToUser[3] = new Customer(userData);
-            selectorToUser[4] = new Customer(userData);
-            switchToBottomNavigationView.putExtra("user", selectorToUser[selectedPersona]);
+            switch (selectedPersona) {
+                case 0:
+                    switchToBottomNavigationView.putExtra("user", new Supplier(userData));
+                    break;
+                case 1:
+                case 2:
+                    switchToBottomNavigationView.putExtra("user", new Driver(userData));
+                    break;
+                case 3:
+                case 4:
+                    switchToBottomNavigationView.putExtra("user", new Customer(userData));
+                    break;
+            }
 
             // Starts the loading icon
             ProgressBar spinner = getActivityWeakReference().get().findViewById(R.id.progressBar);

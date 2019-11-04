@@ -53,6 +53,14 @@ public class InvoicesFragment extends Fragment {
         ViewModelProviders.of(this).get(InvoicesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_invoices, container, false);
 
+        // Displays a message if user is null. Temporary solution for phase 1.
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            root.findViewById(R.id.text_invoices).setVisibility(View.GONE);
+        } else {
+            root.findViewById(R.id.text_invoices).setVisibility(View.VISIBLE);
+        }
+
         configureShowDetailedInvoiceWhenTapped(root);
         return root;
     }

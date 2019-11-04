@@ -33,7 +33,7 @@ public class ProfileFragment extends Fragment {
             textView.append("Hello, " + user.getName() + "!");
         } else {
             textView.clearComposingText();
-            textView.append("Please press on \"Profile\" again.");
+            textView.append("Please tap on \"Profile\" again.");
         }
 
         return root;

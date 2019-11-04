@@ -20,6 +20,9 @@
         <item>Parsa\'s Store (Customer)</item>
     </string-array>
 
+<!--Invoices Fragment-->
+    <string name="invoices_placeholder">Please tap on \"Invoices\" again.</string>
+
 <!--Notification Fragment-->
     <string name="notification_placeholder">Notifications will be configured for phase 2.</string>
 

@@ -16,8 +16,6 @@ import android.widget.TextView;
 
 import com.example.scotia_app.R;
 
-import org.json.JSONObject;
-
 public class DetailedInvoiceActivity extends AppCompatActivity {
 
     @Override
@@ -28,39 +26,32 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detailed_invoice);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         configureBackButton();
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Email me this invoice (DOESNT WORK YET)", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        configureEmailButton();
 
-        TextView invoiceId = (TextView)findViewById(R.id.invoiceId);
-        invoiceId.setText("Invoice ID: " + invoice.getInvoice_id());
+        TextView invoiceId = findViewById(R.id.invoiceId);
+        invoiceId.append("Invoice ID: " + invoice.getInvoice_id());
 
-        TextView customerId = (TextView)findViewById(R.id.customerId);
-        customerId.setText("Customer ID: " + invoice.getCustomer_id());
+        TextView customerId = findViewById(R.id.customerId);
+        customerId.append("Customer ID: " + invoice.getCustomer_id());
 
-        TextView supplierId = (TextView)findViewById(R.id.supplierId);
-        supplierId.setText("Supplier ID: " + invoice.getSupplier_id());
+        TextView supplierId = findViewById(R.id.supplierId);
+        supplierId.append("Supplier ID: " + invoice.getSupplier_id());
 
-        TextView driverId = (TextView)findViewById(R.id.driverId);
-        driverId.setText("Driver ID: " + invoice.getDriver_id());
+        TextView driverId = findViewById(R.id.driverId);
+        driverId.append("Driver ID: " + invoice.getDriver_id());
 
-        TextView status = (TextView)findViewById(R.id.status);
-        status.setText("Order Status: " + invoice.getStatus());
+        TextView status = findViewById(R.id.status);
+        status.append("Order Status: " + invoice.getStatus());
 
-        TextView total = (TextView)findViewById(R.id.total);
-        total.setText("Total: " + invoice.getTotal());
-
+        TextView total = findViewById(R.id.total);
+        total.append("Total: " + invoice.getTotal());
 
     }
 
     private void configureBackButton() {
-        Button backButton = (Button) findViewById(R.id.backButton); {
+        FloatingActionButton backButton = findViewById(R.id.fab_back); {
             backButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -68,6 +59,17 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void configureEmailButton() {
+        FloatingActionButton fab = findViewById(R.id.fab_email);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Email me this invoice (DOESNT WORK YET)", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
 }

@@ -1,10 +1,15 @@
 <resources>
+
+<!--Titles-->
     <string name="app_name">Scotia-App</string>
     <string name="title_persona_selector">Select Persona</string>
     <string name="title_invoices">Invoices</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_profile">Profile</string>
-    <string name="title_activity_bottom_navigation">BottomNavigationActivity</string>
+    <string name="title_activity_bottom_navigation">Bottom Navigation Activity</string>
+    <string name="title_activity_detailed_invoice">Detailed Invoice Activity</string>
+
+<!--Main Activity-->
     <string name="button_persona_selector">Please select your persona!</string>
     <string name="button_start_app">Start App</string>
     <string-array name="personaList">
@@ -14,7 +19,11 @@
         <item>Antoine\'s Convenience Store (Customer)</item>
         <item>Parsa\'s Store (Customer)</item>
     </string-array>
+
+<!--Notification Fragment-->
     <string name="notification_placeholder">Notifications will be configured for phase 2.</string>
-    <string name="title_activity_detailed_invoice">DetailedInvoiceActivity</string>
-    <string name="textview">TextView</string>
+
+<!--Detailed Invoice Activity-->
+    <string name="go_back_to_invoices_list">Go back to invoices list</string>
+
 </resources>

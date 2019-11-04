@@ -22,7 +22,7 @@ public class Invoice implements Parcelable  {
     /**
      * Create a new Invoice with the data in the given parcel.
      *
-     * @param in The data of this invoice.
+     * @param in The data of this Invoice.
      */
     private Invoice(Parcel in) {
         invoice_id  = in.readString();
@@ -57,6 +57,9 @@ public class Invoice implements Parcelable  {
         }
     }
 
+    /**
+     * IDE-generated Parcelable methods
+     */
     public static final Creator<Invoice> CREATOR = new Creator<Invoice>() {
         @Override
         public Invoice createFromParcel(Parcel in) {
@@ -74,15 +77,21 @@ public class Invoice implements Parcelable  {
         return 0;
     }
 
+    /**
+     * Passes the attributes of this Invoice into a parcel
+     *
+     * @param dest The parcel to pass the attributes into
+     * @param flags Optional details about how the attributes should be passed
+     */
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(invoice_id);
-        parcel.writeString(customer_id);
-        parcel.writeString(supplier_id);
-        parcel.writeString(driver_id);
-        parcel.writeString(status);
-        parcel.writeString(total);
-        parcel.writeStringList(orders);
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(invoice_id);
+        dest.writeString(customer_id);
+        dest.writeString(supplier_id);
+        dest.writeString(driver_id);
+        dest.writeString(status);
+        dest.writeString(total);
+        dest.writeStringList(orders);
     }
 
     public String getInvoice_id() {

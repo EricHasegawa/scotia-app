@@ -3,76 +3,85 @@ package com.example.scotia_app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class User implements Parcelable {
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    private String mName;
-    private Persona mPersonaType;
-    private String mId;
+/**
+ * An abstract superclass which stores the attributes of the currently logged in user. Implements
+ * Parcelable so that it can be passed to different fragments and activities
+ */
+public abstract class User implements Parcelable {
 
-    User(String name, Persona personaType, String id) {
-        this.mName = name;
-        this.mPersonaType = personaType;
-        this.mId = id;
+    private String name;
+    private String id;
+    private Persona persona;
+
+    /**
+     * Create a new User with the data in the given parcel.
+     *
+     * @param in The data of this User.
+     */
+    User(Parcel in) {
+        this.name = in.readString();
+        this.id = in.readString();
+        this.persona = Persona.valueOf(in.readString());
     }
 
-    private User(Parcel in) {
-        mName = in.readString();
-        mPersonaType = Persona.valueOf(in.readString());
-        mId = in.readString();
+    /** Create a new User with the data in the given JSONObject.
+     *
+     * @param userData The data of this User.
+     * @param persona The persona of this User.
+     */
+    User(JSONObject userData, Persona persona) {
+        try {
+            this.name = userData.getString("name");
+            this.id = userData.getString("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        this.persona = persona;
     }
 
-    public static final Creator<User> CREATOR = new Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
+    /**
+     * Passes the attributes of the user into a parcel
+     *
+     * @param dest The parcel to pass the attributes into
+     * @param flags Optional details about how the attributes should be passed
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(id);
+        dest.writeString(persona.toString());
+    }
 
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
+    /**
+     * Returns the URL to access the cloud function which returns this User's invoices
+     */
+    public String getInvoiceURL() {
+        return "https://us-central1-scotiabank-app.cloudfunctions.net/get-invoices-by-user-id?" +
+                "id=" + getId() + "&type=" + getPersona();
+    }
 
     public String getName() {
-        return this.mName;
-    }
-
-    public void setName(String name) {
-        this.mName = name;
-    }
-
-    public String getPersonaType() {
-        return this.mPersonaType.name();
-    }
-
-    public void setPersonaType(Persona personaType) {
-        this.mPersonaType = personaType;
+        return name;
     }
 
     public String getId() {
-        return this.mId;
+        return id;
     }
 
-    public void setId(String id) {
-        this.mId = id;
+    public Persona getPersona() {
+        return persona;
     }
 
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mName);
-        parcel.writeString(mPersonaType.name());
-        parcel.writeString(mId);
-    }
 }
 
+/**
+ * Defines different persona types; meant to be used in the user class for convenient switch
+ * statements to define the logic in different fragments and activities
+ */
 enum Persona
 {
-    driver, customer, supplier;
+    driver, customer, supplier
 }

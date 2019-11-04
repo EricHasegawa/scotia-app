@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,8 +27,6 @@ import org.json.*;
 
 public class InvoicesFragment extends Fragment {
 
-    private String invoicesUrl = "https://us-central1-scotiabank-app.cloudfunctions.net/" +
-            "get-invoices-by-user-id?";
     private InvoicesViewModel invoicesViewModel = new InvoicesViewModel();
     private User user;
 
@@ -47,12 +46,8 @@ public class InvoicesFragment extends Fragment {
         if (bundle != null) {
             this.user = bundle.getParcelable("user");
             assert this.user != null;
-            this.invoicesUrl += "id=" + this.user.getId() + "&type=" + this.user.getPersonaType();
-        } else {
-            this.invoicesUrl += "id=placeholderId&type=customer";
+            new InvoicesFetcher(this.getActivity()).execute(user.getInvoiceURL());
         }
-
-        new InvoicesFetcher(this.getActivity()).execute(invoicesUrl);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -63,27 +58,29 @@ public class InvoicesFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Shows the Detailed Invoice Activity corresponding to the tapped Invoice
+     */
     private void configureShowDetailedInvoiceWhenTapped(View root) {
         final ListView listView = root.findViewById(R.id.invoices_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
-                Invoice invoice = null;
                 try {
-                    invoice = new Invoice(invoices.getJSONObject(position));
+                    Invoice invoice = new Invoice(invoices.getJSONObject(position));
+                    showDetailedInvoice.putExtra("invoice", invoice);
+                    showDetailedInvoice.putExtra("user", user);
+                    startActivity(showDetailedInvoice);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                showDetailedInvoice.putExtra("invoice", invoice);
-                showDetailedInvoice.putExtra("user", user);
-                startActivity(showDetailedInvoice);
             }
         });
     }
 
     /**
-     * Fetches and parses the invoice data for some collection of invoicesUrl.
+     * Fetches and parses the invoice data for the logged-in user.
      */
     static private class InvoicesFetcher extends DataFetcher {
 
@@ -133,7 +130,9 @@ public class InvoicesFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+
             AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
+
             ListView listView = context.findViewById(R.id.invoices_list);
             if (listView != null) {
                 listView.setAdapter(InvoicesFragment.adapter);

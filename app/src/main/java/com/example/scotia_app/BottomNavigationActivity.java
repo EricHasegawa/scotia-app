@@ -31,7 +31,7 @@ public class BottomNavigationActivity extends AppCompatActivity {
     }
 
     /**
-     * Helper method to onCreate which sets the navigation controller's nav graph
+     * Helper method for onCreate which sets the navigation controller's nav graph
      */
     private void setNavGraph() {
         BottomNavigationView navView = findViewById(R.id.nav_view);

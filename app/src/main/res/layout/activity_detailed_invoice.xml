@@ -34,64 +34,80 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="34dp"
         android:background="?attr/colorPrimary"
-        app:titleTextColor="@color/white"
         app:layout_anchor="@+id/appBarLayout"
-        app:layout_anchorGravity="center" />
+        app:layout_anchorGravity="center"
+        app:titleTextColor="@color/white" />
 
     <TextView
         android:id="@+id/invoiceId"
-        android:layout_marginTop="100dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="300dp"
         android:gravity="center"
         android:textSize="18sp"
         android:visibility="visible" />
 
     <TextView
         android:id="@+id/customerId"
-        android:layout_marginTop="130dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="330dp"
         android:gravity="center"
         android:textSize="18sp"
         android:visibility="visible" />
 
     <TextView
         android:id="@+id/supplierId"
-        android:layout_marginTop="160dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="360dp"
         android:gravity="center"
         android:textSize="18sp"
         android:visibility="visible" />
 
     <TextView
         android:id="@+id/driverId"
-        android:layout_marginTop="190dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="390dp"
         android:gravity="center"
         android:textSize="18sp"
         android:visibility="visible" />
 
     <TextView
         android:id="@+id/status"
-        android:layout_marginTop="220dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="420dp"
         android:gravity="center"
         android:textSize="18sp"
         android:visibility="visible" />
 
     <TextView
         android:id="@+id/total"
-        android:layout_marginTop="250dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="450dp"
         android:gravity="center"
         android:textSize="18sp"
         android:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:progressBarStyleHorizontal"
+        android:layout_width="219dp"
+        android:layout_height="206dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp"
+        android:progress="80"
+        android:progressDrawable="@drawable/circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

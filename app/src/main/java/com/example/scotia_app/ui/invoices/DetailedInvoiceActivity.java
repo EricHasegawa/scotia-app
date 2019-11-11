@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.scotia_app.R;
@@ -29,6 +30,16 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         configureBackButton();
         configureEmailButton();
 
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        String curr_state = invoice.getStatus();
+        if (curr_state.equals("ISSUED")) {
+            progressBar.setProgress(33);
+        } else if (curr_state.equals("PENDING")) {
+            progressBar.setProgress(66);
+        } else {
+            progressBar.setProgress(100);
+        }
+
         TextView invoiceId = findViewById(R.id.invoiceId);
         invoiceId.append("Invoice ID: " + invoice.getInvoice_id());
 
@@ -42,10 +53,11 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         driverId.append("Driver ID: " + invoice.getDriver_id());
 
         TextView status = findViewById(R.id.status);
-        status.append("Order Status: " + invoice.getStatus());
+        status.append("Order is currently " + curr_state);
 
         TextView total = findViewById(R.id.total);
         total.append("Total: " + invoice.getTotal());
+
 
     }
 

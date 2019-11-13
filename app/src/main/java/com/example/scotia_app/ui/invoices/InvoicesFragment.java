@@ -68,19 +68,27 @@ public class InvoicesFragment extends Fragment {
     /**
      * Shows the Detailed Invoice Activity corresponding to the tapped Invoice
      */
+    private Long lastTimeUserClicked = null;
+    private Long clickTime;
+
     private void configureShowDetailedInvoiceWhenTapped(View root) {
+
         final ListView listView = root.findViewById(R.id.invoices_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
-                try {
-                    Invoice invoice = new Invoice(invoices.getJSONObject(position));
-                    showDetailedInvoice.putExtra("invoice", invoice);
-                    showDetailedInvoice.putExtra("user", user);
-                    startActivity(showDetailedInvoice);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                clickTime = System.currentTimeMillis();
+                if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
+                    Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
+                    try {
+                        Invoice invoice = new Invoice(invoices.getJSONObject(position));
+                        showDetailedInvoice.putExtra("invoice", invoice);
+                        showDetailedInvoice.putExtra("user", user);
+                        startActivity(showDetailedInvoice);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    lastTimeUserClicked = clickTime;
                 }
             }
         });

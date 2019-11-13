@@ -119,6 +119,8 @@ public class InvoicesFragment extends Fragment {
                 return new JSONArray(rawJson);
             } catch (org.json.JSONException e) {
                 e.printStackTrace();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
             return null;
         }
@@ -132,29 +134,33 @@ public class InvoicesFragment extends Fragment {
          */
         @Override
         protected void onPostExecute(ArrayList<String> rawJsons) {
-            invoices = createJSONObjects(rawJsons.get(0));
-            ArrayList<String> invoiceJsons = new ArrayList<>();
-            for (int i = 0; i < invoices.length(); i++) {
-                try {
-                    invoiceJsons.add(
-                            "ID: " +
-                                    invoices.getJSONObject(i).getString("invoice_id") +
-                                    " Status: " +
-                                    invoices.getJSONObject(i).getString("status"));
-                } catch (org.json.JSONException e) {
-                    e.printStackTrace();
+            try {
+                invoices = createJSONObjects(rawJsons.get(0));
+                ArrayList<String> invoiceJsons = new ArrayList<>();
+                for (int i = 0; i < invoices.length(); i++) {
+                    try {
+                        invoiceJsons.add(
+                                "ID: " +
+                                        invoices.getJSONObject(i).getString("invoice_id") +
+                                        " Status: " +
+                                        invoices.getJSONObject(i).getString("status"));
+                    } catch (org.json.JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
 
-            AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
+                AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
 
-            ListView listView = context.findViewById(R.id.invoices_list);
-            if (listView != null) {
-                ArrayAdapter<String> invoicesAdapter = new ArrayAdapter<>
-                        (super.getActivityWeakReference().get(),
-                        android.R.layout.simple_list_item_1, invoiceJsons);
-                listView.setAdapter(invoicesAdapter);
-                invoicesAdapter.notifyDataSetChanged();
+                ListView listView = context.findViewById(R.id.invoices_list);
+                if (listView != null) {
+                    ArrayAdapter<String> invoicesAdapter = new ArrayAdapter<>
+                            (super.getActivityWeakReference().get(),
+                                    android.R.layout.simple_list_item_1, invoiceJsons);
+                    listView.setAdapter(invoicesAdapter);
+                    invoicesAdapter.notifyDataSetChanged();
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
         }
     }

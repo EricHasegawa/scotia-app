@@ -34,6 +34,10 @@ public class Customer extends User implements Parcelable {
         }
     }
 
+    public Customer(String name, String id) {
+        super(name, id, Persona.customer);
+    }
+
     /**
      * Passes the attributes of this Customer into a parcel
      *

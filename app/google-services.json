@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "1014750464419",
+    "firebase_url": "https://scotiabank-app.firebaseio.com",
+    "project_id": "scotiabank-app",
+    "storage_bucket": "scotiabank-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014750464419:android:0f0e3a005ac1d52b757216",
+        "android_client_info": {
+          "package_name": "com.example.scotia_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1014750464419-rv4mkfls3ka1r0ug5vqt5j2b5t30e5m4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.scotia_app",
+            "certificate_hash": "e3387f50cfa74cbc26ae23b8ceabde2c04ca9086"
+          }
+        },
+        {
+          "client_id": "1014750464419-9bss2rfdsbno7ipas2701vpsd9g78hr7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.scotia_app",
+            "certificate_hash": "a15675cfe5792f797df7bb0400a1375445cb13d0"
+          }
+        },
+        {
+          "client_id": "1014750464419-dlt8j2r29cp4j1egsok5i1vmdec0oi9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChL19qwELflPj3DQlt3GheodsI6dtqgts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1014750464419-dlt8j2r29cp4j1egsok5i1vmdec0oi9p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

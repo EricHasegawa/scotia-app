@@ -42,6 +42,12 @@ public abstract class User implements Parcelable {
         this.persona = persona;
     }
 
+    User(String name, String id, Persona personaType) {
+        this.name = name;
+        this.id = id;
+        this.persona = personaType;
+    }
+
     /**
      * Passes the attributes of the user into a parcel
      *

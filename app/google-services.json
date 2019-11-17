@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1014750464419-2p43c9tpgvpi01e782v339rg5205865e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.scotia_app",
+            "certificate_hash": "1ab0b238482740a5aaec55f3a6a41123db3e1ea9"
+          }
+        },
+        {
           "client_id": "1014750464419-rv4mkfls3ka1r0ug5vqt5j2b5t30e5m4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

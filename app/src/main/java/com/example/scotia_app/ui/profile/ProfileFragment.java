@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.R;
-import com.example.scotia_app.User;
+import com.example.scotia_app.data.model.User;
 
 public class ProfileFragment extends Fragment {
 

@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,9 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.DataFetcher;
-import com.example.scotia_app.Invoice;
+import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.R;
-import com.example.scotia_app.User;
+import com.example.scotia_app.data.model.User;
 
 import java.util.ArrayList;
 

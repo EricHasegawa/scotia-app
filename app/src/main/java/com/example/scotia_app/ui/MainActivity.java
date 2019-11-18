@@ -1,4 +1,4 @@
-package com.example.scotia_app;
+package com.example.scotia_app.ui;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +10,12 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.scotia_app.DataFetcher;
+import com.example.scotia_app.R;
+import com.example.scotia_app.data.model.Customer;
+import com.example.scotia_app.data.model.Driver;
+import com.example.scotia_app.data.model.Supplier;
 
 import org.json.JSONObject;
 

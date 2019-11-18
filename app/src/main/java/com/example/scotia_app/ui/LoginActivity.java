@@ -1,16 +1,19 @@
-package com.example.scotia_app;
+package com.example.scotia_app.ui;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.scotia_app.DataFetcher;
+import com.example.scotia_app.NotificationFetcher;
+import com.example.scotia_app.R;
+import com.example.scotia_app.data.model.Customer;
+import com.example.scotia_app.data.model.Driver;
+import com.example.scotia_app.data.model.Supplier;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -54,6 +57,39 @@ public class LoginActivity extends AppCompatActivity {
                         .build(),
                 123);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 123) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            if (resultCode == RESULT_OK) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                initializeUser(user.getUid());
+                sendNotificationTokenToServer(user.getUid());
+                finish();
+            } else {
+                Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
+
+    private void initializeUser(String user_id) {
+        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
+        url += "get-user-by-id?id=" + user_id;
+
+        new UserFetcher(this).execute(url);
+    }
+
+    /**
+     * Called if InstanceID token is updated. This may occur if the security of
+     * the previous token had been compromised. Note that this is called when the InstanceID token
+     * is initially generated so this is where you would retrieve the token.
+     */
+    private void sendNotificationTokenToServer(final String user_id) {
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
@@ -66,27 +102,12 @@ public class LoginActivity extends AppCompatActivity {
 
                         // Get new Instance ID token
                         String token = task.getResult().getToken();
-                        System.out.println("The token for this device is: " + token);
+                        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
+                        url += "register-device-id?uid=" + user_id + "&device_id=" + token;
+
+                        new NotificationFetcher(LoginActivity.this).execute(url);
                     }
                 });
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 123) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-            if (resultCode == RESULT_OK) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                new UserFetcher(this).execute("http://us-central1-scotiabank-app.cloudfunctions.net/get-user-by-id?id=" + user.getUid());
-                finish();
-            } else {
-                Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-
     }
 
     /**
@@ -164,5 +185,4 @@ public class LoginActivity extends AppCompatActivity {
             context.startActivity(switchToBottomNavigationView);
         }
     }
-
 }

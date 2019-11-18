@@ -1,6 +1,9 @@
-package com.example.scotia_app;
+package com.example.scotia_app.ui;
 
 import android.os.Bundle;
+
+import com.example.scotia_app.R;
+import com.example.scotia_app.data.model.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;

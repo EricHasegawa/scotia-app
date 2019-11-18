@@ -1,13 +1,10 @@
 package com.example.scotia_app;
 
-import android.app.Service;
-import android.content.Intent;
-import android.nfc.Tag;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class FirebaseNotificationService extends FirebaseMessagingService {
 
@@ -79,6 +76,8 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
      * @param token: the notification token of this user's device
      */
     private void sendRegistrationToServer(String token) {
-
+        String user_id = "";
+        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
+        url += "register-device-id?uid=" + user_id + "&device_id=" + token;
     }
 }

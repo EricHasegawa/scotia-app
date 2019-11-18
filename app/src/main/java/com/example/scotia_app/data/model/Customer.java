@@ -1,4 +1,4 @@
-package com.example.scotia_app;
+package com.example.scotia_app.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -2,8 +2,8 @@ package com.example.scotia_app.ui.invoices;
 
 import android.os.Bundle;
 
-import com.example.scotia_app.Invoice;
-import com.example.scotia_app.User;
+import com.example.scotia_app.data.model.Invoice;
+import com.example.scotia_app.data.model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 

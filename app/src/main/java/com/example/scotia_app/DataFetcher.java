@@ -1,6 +1,7 @@
 package com.example.scotia_app;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
@@ -50,10 +51,8 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
                 rawJsonStrings.add(fetchText(connection));
             }
             return rawJsonStrings;
-        } catch (java.net.MalformedURLException e1) {
+        } catch (IOException e1) {
             e1.printStackTrace();
-        } catch (java.io.IOException e2) {
-            e2.printStackTrace();
         } finally {
             if (connection != null) {
                 connection.disconnect();

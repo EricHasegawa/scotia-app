@@ -25,6 +25,8 @@ public class Driver extends User implements Parcelable {
         super(userData, Persona.driver);
     }
 
+    public Driver(String name, String id) { super(name, id, Persona.driver); }
+
     /**
      * Passes the attributes of this Driver into a parcel
      *

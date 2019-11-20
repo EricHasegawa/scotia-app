@@ -113,6 +113,8 @@ public class LoginActivity extends AppCompatActivity {
                         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
                         url += "register-device-id?uid=" + user_id + "&device_id=" + token;
 
+                        System.out.println(user_id);
+
                         new NotificationFetcher(LoginActivity.this).execute(url);
                     }
                 });

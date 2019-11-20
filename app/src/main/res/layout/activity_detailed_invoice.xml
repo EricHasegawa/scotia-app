@@ -24,7 +24,7 @@
         app:srcCompat="@drawable/ic_arrow_back_white_24dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_email"
+        android:id="@+id/fab_confirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="300dp"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:visibility="visible" />
 
     <TextView
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="330dp"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:visibility="visible" />
 
     <TextView
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="360dp"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:visibility="visible" />
 
     <TextView
@@ -73,7 +73,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="390dp"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:visibility="visible" />
 
 <!--    <TextView-->
@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="450dp"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:visibility="visible" />
 
     <ProgressBar
@@ -114,7 +114,7 @@
         android:layout_height="471dp"
         android:layout_gravity="bottom"
         android:gravity="center_horizontal"
-        android:textSize="18sp"/>
+        android:textSize="14sp"/>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

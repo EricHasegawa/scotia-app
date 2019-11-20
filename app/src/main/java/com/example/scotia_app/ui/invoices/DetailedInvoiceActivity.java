@@ -1,8 +1,11 @@
 package com.example.scotia_app.ui.invoices;
 
+import android.app.Activity;
 import android.os.Bundle;
 
+import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.data.model.Invoice;
+import com.example.scotia_app.data.model.Persona;
 import com.example.scotia_app.data.model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -16,6 +19,8 @@ import android.widget.TextView;
 
 import com.example.scotia_app.R;
 
+import java.util.ArrayList;
+
 public class DetailedInvoiceActivity extends AppCompatActivity {
 
     @Override
@@ -28,7 +33,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         configureBackButton();
-        configureEmailButton();
+        configureConfirmButton(invoice, user);
 
         ProgressBar progressBar = findViewById(R.id.progressBar);
         String curr_state = invoice.getStatus();
@@ -72,16 +77,46 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         }
     }
 
-    private void configureEmailButton() {
-        FloatingActionButton fab = findViewById(R.id.fab_email);
+    private void configureConfirmButton(final Invoice invoice, final User user) {
+        FloatingActionButton fab = findViewById(R.id.fab_confirm);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Snackbar.make(view, "This order has now been confirmed.", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (user.getPersona() == Persona.customer) {
+                    String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
+                    url += "confirm-payment?id=" + invoice.getInvoice_id();
+                    new ConfirmFetcher(DetailedInvoiceActivity.this).execute(url);
+                    Snackbar.make(view, "This order has now been confirmed.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    Snackbar.make(view, "Only the customer can confirm an order.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
             }
         });
     }
 
+    /**
+     * Sends this device's notification id to the database
+     */
+    private static class ConfirmFetcher extends DataFetcher {
+
+        /**
+         * Initialize a new NotificationFetcher, which runs in the given context.
+         *
+         * @param context The context in which this UserFetcher runs.
+         */
+        public ConfirmFetcher(Activity context) {
+            super(context);
+        }
+
+        /**
+         * After super.doInBackground is finished executing, do nothing. This method is only written
+         * since it has to be overridden
+         *
+         * @param rawJsons The list of raw json strings whose first element is the user data
+         */
+        @Override
+        protected void onPostExecute(ArrayList<String> rawJsons) {  }
+    }
 }

@@ -77,7 +77,8 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Email me this invoice (DOESNT WORK YET)", Snackbar.LENGTH_LONG)
+
+                Snackbar.make(view, "This order has now been confirmed.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });

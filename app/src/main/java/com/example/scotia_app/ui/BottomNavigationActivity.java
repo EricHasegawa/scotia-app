@@ -56,12 +56,25 @@ public class BottomNavigationActivity extends AppCompatActivity {
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
+        passUserInitially(navController);
     }
 
     /**
-     * Helper method to setNavGraph which passes the current user to all the fragments and also
-     * passes the user again whenever the destination is changed since the selected fragment is
-     * recreated on each destination change
+     * Helper method to setNavGraph which passes the current user to all the fragments for the
+     * initial load
+     */
+    private void passUserInitially(NavController navController) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("user", user);
+        navController.navigate(R.id.navigation_invoices, bundle);
+        navController.navigate(R.id.navigation_profile, bundle);
+        navController.navigate(R.id.navigation_notifications, bundle);
+    }
+
+    /**
+     * Helper method to setNavGraph which passes the current user to all the fragments whenever the
+     * destination is changed since the selected fragment is recreated on each destination change
      */
     private void passUserToAllFragments(NavGraph navGraph, final NavController navController) {
         final NavArgument userArgument = new NavArgument.Builder().setDefaultValue(user).build();

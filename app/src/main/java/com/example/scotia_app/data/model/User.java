@@ -64,9 +64,9 @@ public abstract class User implements Parcelable {
     /**
      * Returns the URL to access the cloud function which returns this User's invoices
      */
-    public String getInvoiceURL() {
+    public String getInvoiceURL(Category category) {
         return "https://us-central1-scotiabank-app.cloudfunctions.net/get-invoices-by-user-id?" +
-                "id=" + getId() + "&type=" + getPersona();
+                "id=" + getId() + "&filter=" + category;
     }
 
     public String getName() {

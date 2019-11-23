@@ -16,7 +16,7 @@
         <service
             android:name=".FirebaseNotificationService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -33,19 +33,22 @@
             android:name=".ui.invoices.DetailedInvoiceActivity"
             android:label="@string/title_activity_detailed_invoice"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".ui.BottomNavigationActivity"
             android:label="@string/title_activity_bottom_navigation" />
+
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/title_persona_selector" />
+
         <activity android:name=".ui.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

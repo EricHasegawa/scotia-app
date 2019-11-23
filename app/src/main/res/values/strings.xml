@@ -22,6 +22,8 @@
 
 <!--Invoices Fragment-->
     <string name="invoices_placeholder">Please tap on \"Invoices\" again.</string>
+    <string name="tab_past">Past</string>
+    <string name="tab_upcoming">Upcoming</string>
 
 <!--Notification Fragment-->
     <string name="notification_placeholder">Notifications will be configured for phase 2.</string>

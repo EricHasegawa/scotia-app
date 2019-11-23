@@ -33,6 +33,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         configureBackButton();
+        assert user != null;
         configureConfirmButton(invoice, user);
 
         ProgressBar progressBar = findViewById(R.id.progressBar);
@@ -62,8 +63,6 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
         TextView total = findViewById(R.id.total);
         total.append("Total: " + invoice.getTotal());
-
-
     }
 
     private void configureBackButton() {
@@ -79,21 +78,20 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private void configureConfirmButton(final Invoice invoice, final User user) {
         FloatingActionButton fab = findViewById(R.id.fab_confirm);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (user.getPersona() == Persona.customer) {
+        if (user.getPersona() == Persona.customer) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
                     String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
                     url += "confirm-payment?id=" + invoice.getInvoice_id();
                     new ConfirmFetcher(DetailedInvoiceActivity.this).execute(url);
                     Snackbar.make(view, "This order has now been confirmed.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                } else {
-                    Snackbar.make(view, "Only the customer can confirm an order.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
                 }
-            }
-        });
+            });
+        } else {
+            fab.hide();
+        }
     }
 
     /**

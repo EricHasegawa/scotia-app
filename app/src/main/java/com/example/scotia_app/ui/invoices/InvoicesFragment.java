@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -16,9 +17,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.DataFetcher;
+import com.example.scotia_app.data.model.Category;
 import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.User;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
@@ -28,6 +31,9 @@ public class InvoicesFragment extends Fragment {
 
     private InvoicesViewModel invoicesViewModel = new InvoicesViewModel();
     private User user;
+    private Long lastTimeUserClicked = null;
+    private Long clickTime;
+    private Category defaultCategory = Category.past;
 
     /**
      * A List of Views corresponding to invoice previews to populate the invoice page's ScrollView.
@@ -38,13 +44,8 @@ public class InvoicesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Gets the selected user
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            this.user = bundle.getParcelable("user");
-            assert this.user != null;
-            new InvoicesFetcher(this.getActivity()).execute(user.getInvoiceURL());
-        }
+        setUser();
+        loadInvoices(defaultCategory);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -52,26 +53,51 @@ public class InvoicesFragment extends Fragment {
         ViewModelProviders.of(this).get(InvoicesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_invoices, container, false);
 
-        // Displays a message if user is null. Temporary solution for phase 1.
+        configureShowDetailedInvoiceWhenTapped(root);
+        configureTabClicked(root);
+
+        return root;
+    }
+
+    private void setUser() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            root.findViewById(R.id.text_invoices).setVisibility(View.GONE);
-        } else {
-            root.findViewById(R.id.text_invoices).setVisibility(View.VISIBLE);
+            this.user = bundle.getParcelable("user");
         }
+    }
 
-        configureShowDetailedInvoiceWhenTapped(root);
-        return root;
+    private void configureTabClicked(View root) {
+        final TabLayout tabLayout = root.findViewById(R.id.filter_tabs);
+        tabLayout.getTabAt(1).select();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getText() == getResources().getString(R.string.tab_upcoming)) {
+                    loadInvoices(Category.upcoming);
+                } else {
+                    loadInvoices(Category.past);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) { }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }
+        });
+    }
+
+    private void loadInvoices(Category category) {
+        if (this.user != null) {
+            new InvoicesFetcher(this.getActivity()).execute(user.getInvoiceURL(category));
+        }
     }
 
     /**
      * Shows the Detailed Invoice Activity corresponding to the tapped Invoice
      */
-    private Long lastTimeUserClicked = null;
-    private Long clickTime;
-
     private void configureShowDetailedInvoiceWhenTapped(View root) {
-
         final ListView listView = root.findViewById(R.id.invoices_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -118,8 +144,6 @@ public class InvoicesFragment extends Fragment {
                 return new JSONArray(rawJson);
             } catch (org.json.JSONException e) {
                 e.printStackTrace();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
             }
             return null;
         }
@@ -151,7 +175,9 @@ public class InvoicesFragment extends Fragment {
                 AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
 
                 ListView listView = context.findViewById(R.id.invoices_list);
+
                 if (listView != null) {
+                    listView.setAdapter(null);
                     ArrayAdapter<String> invoicesAdapter = new ArrayAdapter<>
                             (super.getActivityWeakReference().get(),
                                     android.R.layout.simple_list_item_1, invoiceJsons);

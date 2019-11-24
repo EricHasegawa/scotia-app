@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.R;
-import com.example.scotia_app.data.model.Status;
 import com.example.scotia_app.data.model.User;
 import com.example.scotia_app.ui.invoices.DetailedInvoiceActivity;
 
@@ -30,9 +29,9 @@ import org.json.*;
 
 public class NotificationsFragment extends Fragment {
 
-    private User user;
-    private Long lastTimeUserClicked = null;
-    private Long clickTime;
+    private static User user;
+    private static Long lastTimeUserClicked = null;
+    private static Long clickTime;
 
     /**
      * A List of JSONs corresponding to notifications to populate the notification page's ListView.
@@ -57,7 +56,7 @@ public class NotificationsFragment extends Fragment {
     private void setUser() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            this.user = bundle.getParcelable("user");
+            user = bundle.getParcelable("user");
         }
     }
 
@@ -71,12 +70,11 @@ public class NotificationsFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 clickTime = System.currentTimeMillis();
                 if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
-                    Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
                     try {
-                        Invoice invoice = new Invoice(notifications.getJSONObject(position));
-                        showDetailedInvoice.putExtra("invoice", invoice);
-                        showDetailedInvoice.putExtra("user", user);
-                        startActivity(showDetailedInvoice);
+                        String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
+                        url += "get-invoice?id=" +
+                                notifications.getJSONObject(0).getString("invoice_id");
+                        new InvoiceFetcher(getActivity()).execute(url);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -136,12 +134,13 @@ public class NotificationsFragment extends Fragment {
         private void refreshInvoicesList(AppCompatActivity context) {
             ListView listView = context.findViewById(R.id.notifications_list);
             if (listView != null) {
-                NotificationAdapter notificationAdapter = new NotificationAdapter(context, notifications);
+                NotificationAdapter notificationAdapter = new NotificationAdapter(context);
                 listView.setAdapter(notificationAdapter);
                 notificationAdapter.notifyDataSetChanged();
             }
         }
 
+        //TODO
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
             textView.setVisibility(View.VISIBLE);
@@ -154,19 +153,49 @@ public class NotificationsFragment extends Fragment {
         }
     }
 
+    /**
+     * Fetches and parses the invoice data for the logged-in user.
+     */
+    private static class InvoiceFetcher extends DataFetcher {
+
+        /**
+         * Initialize a new InvoicesFetcher, which runs in the given context.
+         *
+         * @param context The context in which this InvoicesFetcher runs.
+         */
+        InvoiceFetcher(Activity context) {
+            super(context);
+        }
+
+        /**
+         * After super.doInBackground is finished executing, store the JSONObjects corresponding to
+         * the raw strings in rawJsons in invoices, and populate the ListView with formatted strings
+         * with each invoice's ID and order status.
+         *
+         * @param rawJsons The list of raw json strings to be parsed and used in the UI.
+         */
+        @Override
+        protected void onPostExecute(ArrayList<String> rawJsons) {
+            Intent showDetailedInvoice = new Intent(super.getActivityWeakReference().get().getApplicationContext(), DetailedInvoiceActivity.class);
+            JSONObject invoiceJson = super.createJSONObject(rawJsons.get(0));
+            Invoice invoice = new Invoice(invoiceJson);
+            showDetailedInvoice.putExtra("invoice", invoice);
+            showDetailedInvoice.putExtra("user", user);
+            super.getActivityWeakReference().get().getApplicationContext().startActivity(showDetailedInvoice);
+        }
+    }
+
     private static class NotificationAdapter extends BaseAdapter {
 
         private Context context;
-        private JSONArray notificationJson;
 
-        private NotificationAdapter(Context context, JSONArray notificationJson) {
+        private NotificationAdapter(Context context) {
             this.context = context;
-            this.notificationJson = notificationJson;
         }
 
         @Override
         public int getCount() {
-            return notificationJson.length();
+            return notifications.length();
         }
 
         @Override
@@ -194,7 +223,7 @@ public class NotificationsFragment extends Fragment {
             TextView textStatus = view.findViewById(R.id.textView_date);
 
             try {
-                JSONObject jsonObject = notificationJson.getJSONObject(i);
+                JSONObject jsonObject = notifications.getJSONObject(i);
                 String id = jsonObject.getString("message");
                 String status = jsonObject.getString("date");
 

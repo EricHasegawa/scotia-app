@@ -34,8 +34,6 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detailed_invoice);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        assert invoice != null;
         getSupportActionBar().setTitle("Invoice #" + invoice.getDisplayId());
 
         configureBackButton();
@@ -55,20 +53,20 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                 progressBar.setProgress(100);
         }
 
+        TextView status = findViewById(R.id.status);
+        status.append(invoice.getStatus().toString());
+
         TextView invoiceId = findViewById(R.id.invoiceId);
         invoiceId.append("Invoice ID: " + invoice.getId());
 
         TextView customerId = findViewById(R.id.customerId);
-        customerId.append("Customer ID: " + invoice.getCustomerName());
+        customerId.append("Customer: " + invoice.getCustomerName());
 
         TextView supplierId = findViewById(R.id.supplierId);
-        supplierId.append("Supplier ID: " + invoice.getSupplierName());
+        supplierId.append("Supplier: " + invoice.getSupplierName());
 
         TextView driverId = findViewById(R.id.driverId);
-        driverId.append("Driver ID: " + invoice.getDriverName());
-
-        TextView status = findViewById(R.id.status);
-        status.append("Order has been " + invoice.getStatus());
+        driverId.append("Driver: " + invoice.getDriverName());
 
         TextView total = findViewById(R.id.total);
         total.append("Total: " + invoice.getTotal());

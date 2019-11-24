@@ -1,5 +1,6 @@
 package com.example.scotia_app.ui.invoices;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -96,6 +97,7 @@ public class InvoicesFragment extends Fragment {
      */
     private void configureShowDetailedInvoiceWhenTapped(View root) {
         final ListView listView = root.findViewById(R.id.invoices_list);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -119,6 +121,7 @@ public class InvoicesFragment extends Fragment {
     private void configureTabClicked(final View root) {
         final TabLayout tabLayout = root.findViewById(R.id.filter_tabs);
         Objects.requireNonNull(tabLayout.getTabAt(1)).select();
+        tabLayout.setBackgroundColor(getContext().getColor(R.color.white));
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -176,7 +179,7 @@ public class InvoicesFragment extends Fragment {
         private void refreshInvoicesList(AppCompatActivity context) {
             ListView listView = context.findViewById(R.id.invoices_list);
             if (listView != null) {
-                InvoiceAdapter invoiceAdapter = new InvoiceAdapter(context, invoices);
+                InvoiceAdapter invoiceAdapter = new InvoiceAdapter(context);
                 listView.setAdapter(invoiceAdapter);
                 invoiceAdapter.notifyDataSetChanged();
             }
@@ -204,16 +207,14 @@ public class InvoicesFragment extends Fragment {
     private static class InvoiceAdapter extends BaseAdapter {
 
         private Context context;
-        private JSONArray invoiceJson;
 
-        private InvoiceAdapter(Context context, JSONArray invoiceJson) {
+        private InvoiceAdapter(Context context) {
             this.context = context;
-            this.invoiceJson = invoiceJson;
         }
 
         @Override
         public int getCount() {
-            return invoiceJson.length();
+            return invoices.length();
         }
 
         @Override
@@ -226,6 +227,7 @@ public class InvoicesFragment extends Fragment {
             return 0;
         }
 
+        @SuppressLint("ViewHolder")
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             view = LayoutInflater.from(context).inflate(R.layout.invoice_layout, null);
@@ -234,7 +236,7 @@ public class InvoicesFragment extends Fragment {
             TextView textStatus = view.findViewById(R.id.textView_status);
 
             try {
-                JSONObject jsonObject = invoiceJson.getJSONObject(i);
+                JSONObject jsonObject = invoices.getJSONObject(i);
                 String id = jsonObject.getString("invoice_id_short");
                 String status = jsonObject.getString("status");
 

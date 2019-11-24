@@ -108,21 +108,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /**
-         * Returns a JSONObject with which to populate the User.
-         *
-         * @param rawJson The raw json string to be parsed
-         * @return A List of JSONObjects, each corresponding to a raw json string.
-         */
-        private JSONObject createJSONObject(String rawJson) {
-            try {
-                return new JSONObject(rawJson);
-            } catch (org.json.JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        /**
          * After super.doInBackground is finished executing, populate a user with the retrieved JSON
          *
          * @param rawJsons The list of raw json strings whose first element is the user data

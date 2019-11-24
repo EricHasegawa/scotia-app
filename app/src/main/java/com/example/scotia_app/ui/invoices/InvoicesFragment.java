@@ -15,29 +15,29 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.data.model.Filter;
 import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.R;
+import com.example.scotia_app.data.model.Status;
 import com.example.scotia_app.data.model.User;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.json.*;
 
 public class InvoicesFragment extends Fragment {
 
-    private InvoicesViewModel invoicesViewModel = new InvoicesViewModel();
     private User user;
     private Long lastTimeUserClicked = null;
     private Long clickTime;
-    private Filter defaultFilter = Filter.upcoming;
+    private static final int UPCOMING = 1;
 
     /**
-     * A List of Views corresponding to invoice previews to populate the invoice page's ScrollView.
+     * A List of JSONs corresponding to invoice previews to populate the invoice page's ListView.
      */
     private static JSONArray invoices = new JSONArray();
 
@@ -47,16 +47,29 @@ public class InvoicesFragment extends Fragment {
         setUser();
     }
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        ViewModelProviders.of(this).get(InvoicesViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_invoices, container, false);
-
-        loadInvoices(defaultFilter, root);
         configureShowDetailedInvoiceWhenTapped(root);
         configureTabClicked(root);
-
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        View view = getView();
+
+        if (view != null) {
+            final TabLayout tabLayout = view.findViewById(R.id.filter_tabs);
+            int tabNumber = tabLayout.getSelectedTabPosition();
+
+            if (tabNumber == UPCOMING) {
+                loadInvoices(Filter.upcoming, view);
+            } else {
+                loadInvoices(Filter.completed, view);
+            }
+        }
     }
 
     private void setUser() {
@@ -66,30 +79,11 @@ public class InvoicesFragment extends Fragment {
         }
     }
 
-    private void configureTabClicked(final View root) {
-        final TabLayout tabLayout = root.findViewById(R.id.filter_tabs);
-        tabLayout.getTabAt(1).select();
-
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getText() == getResources().getString(R.string.tab_upcoming)) {
-                    loadInvoices(Filter.upcoming, root);
-                } else {
-                    loadInvoices(Filter.completed, root);
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) { }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
-        });
-    }
-
     private void loadInvoices(Filter filter, View root) {
         final ListView listView = root.findViewById(R.id.invoices_list);
+        TextView textView = root.findViewById(R.id.textView_placeholder);
+
+        textView.setText(null);
         listView.setAdapter(null);
 
         if (this.user != null) {
@@ -122,10 +116,32 @@ public class InvoicesFragment extends Fragment {
         });
     }
 
+    private void configureTabClicked(final View root) {
+        final TabLayout tabLayout = root.findViewById(R.id.filter_tabs);
+        Objects.requireNonNull(tabLayout.getTabAt(1)).select();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getText() == getResources().getString(R.string.tab_upcoming)) {
+                    loadInvoices(Filter.upcoming, root);
+                } else {
+                    loadInvoices(Filter.completed, root);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) { }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }
+        });
+    }
+
     /**
      * Fetches and parses the invoice data for the logged-in user.
      */
-    private class InvoicesFetcher extends DataFetcher {
+    private static class InvoicesFetcher extends DataFetcher {
 
         /**
          * Initialize a new InvoicesFetcher, which runs in the given context.
@@ -134,21 +150,6 @@ public class InvoicesFragment extends Fragment {
          */
         InvoicesFetcher(Activity context) {
             super(context);
-        }
-
-        /**
-         * Return a list of JSONObjects with which to populate invoices.
-         *
-         * @param rawJson The raw json string to be parsed
-         * @return A List of JSONObjects, each corresponding to a raw json string.
-         */
-        private JSONArray createJSONObjects(String rawJson) {
-            try {
-                return new JSONArray(rawJson);
-            } catch (org.json.JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
         }
 
         /**
@@ -161,36 +162,58 @@ public class InvoicesFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<String> rawJsons) {
             try {
-                invoices = createJSONObjects(rawJsons.get(0));
-
+                invoices = super.createJSONObjects(rawJsons.get(0));
                 AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
-                ListView listView = context.findViewById(R.id.invoices_list);
 
-                if (listView != null) {
-                    InvoiceAdapter invoiceAdapter = new InvoiceAdapter(context, invoices);
-                    listView.setAdapter(invoiceAdapter);
-                    invoiceAdapter.notifyDataSetChanged();
-                }
+                showPlaceholder(context);
+                refreshInvoicesList(context);
+
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
         }
+
+        private void refreshInvoicesList(AppCompatActivity context) {
+            ListView listView = context.findViewById(R.id.invoices_list);
+            if (listView != null) {
+                InvoiceAdapter invoiceAdapter = new InvoiceAdapter(context, invoices);
+                listView.setAdapter(invoiceAdapter);
+                invoiceAdapter.notifyDataSetChanged();
+            }
+        }
+
+        private void showPlaceholder(AppCompatActivity context) {
+            TextView textView = context.findViewById(R.id.textView_placeholder);
+
+            if (invoices.length() == 0) {
+                TabLayout tabLayout = context.findViewById(R.id.filter_tabs);
+                int tabNumber = tabLayout.getSelectedTabPosition();
+                if (tabNumber == UPCOMING) {
+                    textView.setText("You have no\nupcoming orders.");
+                } else {
+                    textView.setText("You have no past orders.\nWelcome to " +
+                            context.getString(R.string.app_name));
+                }
+                textView.setVisibility(View.VISIBLE);
+            } else {
+                textView.setVisibility(View.GONE);
+            }
+        }
     }
 
-    private class InvoiceAdapter extends BaseAdapter {
+    private static class InvoiceAdapter extends BaseAdapter {
 
         private Context context;
-        private JSONArray invoiceJsons;
-        final private String PAID = "PAID";
+        private JSONArray invoiceJson;
 
-        private InvoiceAdapter(Context context, JSONArray invoiceJsons) {
+        private InvoiceAdapter(Context context, JSONArray invoiceJson) {
             this.context = context;
-            this.invoiceJsons = invoiceJsons;
+            this.invoiceJson = invoiceJson;
         }
 
         @Override
         public int getCount() {
-            return invoiceJsons.length();
+            return invoiceJson.length();
         }
 
         @Override
@@ -211,15 +234,19 @@ public class InvoicesFragment extends Fragment {
             TextView textStatus = view.findViewById(R.id.textView_status);
 
             try {
-                JSONObject jsonObject = invoiceJsons.getJSONObject(i);
+                JSONObject jsonObject = invoiceJson.getJSONObject(i);
                 String id = jsonObject.getString("invoice_id_short");
                 String status = jsonObject.getString("status");
 
                 textId.setText(id);
                 textStatus.setText(status);
 
-                if (status.equals(PAID)) {
-                    textStatus.setTextColor(context.getResources().getColor(R.color.lightGreen));
+                boolean paidOrDelivered = status.equals(Status.PAID.toString()) ||
+                        status.equals(Status.DELIVERED.toString());
+
+                // Sets text color to green if invoice has been paid or delivered
+                if (paidOrDelivered) {
+                    textStatus.setTextColor(context.getResources().getColor(R.color.lightGreen, null));
                 }
 
             } catch (JSONException e) {

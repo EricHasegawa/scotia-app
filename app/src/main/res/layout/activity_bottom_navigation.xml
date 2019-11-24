@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:launchMode = "singleTop"
-    android:paddingTop="?attr/actionBarSize">
+    android:paddingTop="0dp">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"

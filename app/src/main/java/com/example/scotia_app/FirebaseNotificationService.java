@@ -79,6 +79,6 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
         String user_id = "";
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
         url += "register-device-id?uid=" + user_id + "&device_id=" + token;
-//        new NotificationFetcher()
+//        new NotificationTokenFetcher()
     }
 }

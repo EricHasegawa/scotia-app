@@ -7,14 +7,14 @@ import java.util.ArrayList;
 /**
  * Sends this device's notification id to the database
  */
-public class NotificationFetcher extends DataFetcher {
+public class NotificationTokenFetcher extends DataFetcher {
 
     /**
-     * Initialize a new NotificationFetcher, which runs in the given context.
+     * Initialize a new NotificationTokenFetcher, which runs in the given context.
      *
      * @param context The context in which this UserFetcher runs.
      */
-    public NotificationFetcher(Activity context) {
+    public NotificationTokenFetcher(Activity context) {
         super(context);
     }
 

@@ -5,7 +5,7 @@
     <string name="title_persona_selector">Select Persona</string>
     <string name="title_invoices">Invoices</string>
     <string name="title_notifications">Notifications</string>
-    <string name="title_profile">Profile</string>
+    <string name="title_settings">Settings</string>
     <string name="title_activity_bottom_navigation">Bottom Navigation Activity</string>
     <string name="title_activity_detailed_invoice">Detailed Invoice Activity</string>
 
@@ -21,14 +21,11 @@
     </string-array>
 
 <!--Invoices Fragment-->
-    <string name="invoices_placeholder">Please tap on \"Invoices\" again.</string>
+    <string name="invoices_placeholder">You have no invoices.</string>
     <string name="tab_completed">Completed</string>
     <string name="tab_upcoming">Upcoming</string>
 
 <!--Notification Fragment-->
-    <string name="notification_placeholder">Notifications will be configured for phase 2.</string>
-
-<!--Detailed Invoice Activity-->
-    <string name="go_back_to_invoices_list">Go back to invoices list</string>
+    <string name="notification_placeholder">You do not have any notifications.</string>
 
 </resources>

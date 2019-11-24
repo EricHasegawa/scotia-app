@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.os.AsyncTask;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * A class for fetching data from the database. Contains several methods used to retrieve and select
  * specific items from the database, each of which return raw json to be parsed and used in the UI.
@@ -103,4 +107,33 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
         return activityWeakReference;
     }
 
+    /**
+     * Return a list of JSONObjects with which to populate invoices.
+     *
+     * @param rawJson The raw json string to be parsed
+     * @return A List of JSONObjects, each corresponding to a raw json string.
+     */
+     protected JSONArray createJSONObjects(String rawJson) {
+        try {
+            return new JSONArray(rawJson);
+        } catch (org.json.JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Returns a JSONObject with which to populate the User.
+     *
+     * @param rawJson The raw json string to be parsed
+     * @return A List of JSONObjects, each corresponding to a raw json string.
+     */
+    protected JSONObject createJSONObject(String rawJson) {
+        try {
+            return new JSONObject(rawJson);
+        } catch (JSONException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

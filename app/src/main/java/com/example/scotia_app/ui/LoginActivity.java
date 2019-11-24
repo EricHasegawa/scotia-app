@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.scotia_app.DataFetcher;
-import com.example.scotia_app.NotificationFetcher;
+import com.example.scotia_app.NotificationTokenFetcher;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.Customer;
 import com.example.scotia_app.data.model.Driver;
@@ -63,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
 
         } else {
             initializeUser(user.getUid());
-            sendNotificationTokenToServer(user.getUid());
         }
     }
 
@@ -76,8 +75,6 @@ public class LoginActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 initializeUser(user.getUid());
-                sendNotificationTokenToServer(user.getUid());
-                //finish();
             } else {
                 Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -86,6 +83,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initializeUser(String user_id) {
+        sendNotificationTokenToServer(user_id);
+
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
         url += "get-user-by-id?id=" + user_id;
 
@@ -115,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         System.out.println(user_id);
 
-                        new NotificationFetcher(LoginActivity.this).execute(url);
+                        new NotificationTokenFetcher(LoginActivity.this).execute(url);
                     }
                 });
     }
@@ -134,21 +133,6 @@ public class LoginActivity extends AppCompatActivity {
          */
         UserFetcher(Activity context) {
             super(context);
-        }
-
-        /**
-         * Returns a JSONObject with which to populate the User.
-         *
-         * @param rawJson The raw json string to be parsed
-         * @return A List of JSONObjects, each corresponding to a raw json string.
-         */
-        private JSONObject createJSONObject(String rawJson) {
-            try {
-                return new JSONObject(rawJson);
-            } catch (JSONException | NullPointerException e) {
-                e.printStackTrace();
-            }
-            return null;
         }
 
         /**
@@ -298,6 +282,5 @@ public class LoginActivity extends AppCompatActivity {
             AlertDialog dialog = builder.create();
             dialog.show();
         }
-
     }
 }

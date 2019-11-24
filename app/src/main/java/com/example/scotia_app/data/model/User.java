@@ -69,6 +69,14 @@ public abstract class User implements Parcelable {
                 "id=" + getId() + "&filter=" + filter;
     }
 
+    /**
+     * Returns the URL to access the cloud function which returns this User's notifications
+     */
+    public String getNotificationURL() {
+        return "https://us-central1-scotiabank-app.cloudfunctions.net/get-notifications-by-user-id?"
+                + "id=" + getId();
+    }
+
     public String getName() {
         return name;
     }

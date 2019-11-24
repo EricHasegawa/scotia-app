@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.example.scotia_app.ui.profile.ProfileFragment"
-        android:label="@string/title_profile"
+        android:label="@string/title_settings"
         tools:layout="@layout/fragment_profile" >
     </fragment>
 </navigation>

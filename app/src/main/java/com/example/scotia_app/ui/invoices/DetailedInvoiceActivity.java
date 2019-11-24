@@ -119,6 +119,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         new ConfirmFetcher(DetailedInvoiceActivity.this).execute(url);
         Snackbar.make(view, "This order has now been confirmed as PAID.", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+        TextView status = findViewById(R.id.status);
+        status.clearComposingText();
+        status.setText("Order has been PAID");
     }
 
     private void confirmDelivery(Invoice invoice, View view) {
@@ -131,6 +134,8 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             new ConfirmFetcher(DetailedInvoiceActivity.this).execute(url);
             Snackbar.make(view, "This order has now been confirmed as DELIVERED.",
                     Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            TextView status = findViewById(R.id.status);
+            status.setText("Order has been DELIVERED");
         }
     }
 
@@ -140,7 +145,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     private static class ConfirmFetcher extends DataFetcher {
 
         /**
-         * Initialize a new NotificationFetcher, which runs in the given context.
+         * Initialize a new NotificationTokenFetcher, which runs in the given context.
          *
          * @param context The context in which this UserFetcher runs.
          */

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.example.scotia_app.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class DetailedInvoiceActivity extends AppCompatActivity {
 
@@ -34,7 +35,8 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detailed_invoice);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Invoice #" + invoice.getDisplayId());
+        assert invoice != null;
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Invoice #" + invoice.getDisplayId());
 
         configureBackButton();
 
@@ -43,14 +45,14 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
         ProgressBar progressBar = findViewById(R.id.progressBar);
         switch (invoice.getStatus()) {
+            case DELIVERED:
+                progressBar.setProgress(100);
             case ISSUED:
                 progressBar.setProgress(25);
             case PENDING:
                 progressBar.setProgress(50);
             case PAID:
                 progressBar.setProgress(75);
-            case DELIVERED:
-                progressBar.setProgress(100);
         }
 
         TextView status = findViewById(R.id.status);
@@ -119,7 +121,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                 .setAction("Action", null).show();
         TextView status = findViewById(R.id.status);
         status.clearComposingText();
-        status.setText("Order has been PAID");
+        status.setText(Status.PAID.toString());
     }
 
     private void confirmDelivery(Invoice invoice, View view) {
@@ -133,7 +135,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             Snackbar.make(view, "This order has now been confirmed as DELIVERED.",
                     Snackbar.LENGTH_LONG).setAction("Action", null).show();
             TextView status = findViewById(R.id.status);
-            status.setText("Order has been DELIVERED");
+            status.setText(Status.DELIVERED.toString());
         }
     }
 
@@ -147,7 +149,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
          *
          * @param context The context in which this UserFetcher runs.
          */
-        public ConfirmFetcher(Activity context) {
+        ConfirmFetcher(Activity context) {
             super(context);
         }
 

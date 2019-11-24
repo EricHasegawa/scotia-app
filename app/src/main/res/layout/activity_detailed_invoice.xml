@@ -7,31 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".ui.invoices.DetailedInvoiceActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="52dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <include
-        android:id="@+id/include"
-        layout="@layout/content_detailed_invoice"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="fill_parent"
         android:layout_height="52dp"
         android:background="?attr/colorPrimary"
-        app:layout_anchor="@+id/appBarLayout"
-        app:layout_constraintEnd_toStartOf="@+id/include"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@color/white" />

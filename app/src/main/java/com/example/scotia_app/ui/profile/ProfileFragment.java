@@ -15,12 +15,8 @@ import com.example.scotia_app.data.model.User;
 
 public class ProfileFragment extends Fragment {
 
-    private ProfileViewModel profileViewModel;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        profileViewModel =
-                ViewModelProviders.of(this).get(ProfileViewModel.class);
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
 
         // Sets the textview's text to the user's name if the user is not null
@@ -31,9 +27,6 @@ public class ProfileFragment extends Fragment {
             User user = bundle.getParcelable("user");
             assert user != null;
             textView.append("Hello, " + user.getName() + "!");
-        } else {
-            textView.clearComposingText();
-            textView.append("Please tap on \"Profile\" again.");
         }
 
         return root;

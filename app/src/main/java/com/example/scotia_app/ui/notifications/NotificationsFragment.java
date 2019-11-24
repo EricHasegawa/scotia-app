@@ -140,16 +140,15 @@ public class NotificationsFragment extends Fragment {
             }
         }
 
-        //TODO
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
             textView.setVisibility(View.VISIBLE);
 
-//            if (notifications.length() == 0) {
-//                textView.setVisibility(View.VISIBLE);
-//            } else {
-//                textView.setVisibility(View.GONE);
-//            }
+            if (notifications.length() == 0) {
+                textView.setVisibility(View.VISIBLE);
+            } else {
+                textView.setVisibility(View.GONE);
+            }
         }
     }
 

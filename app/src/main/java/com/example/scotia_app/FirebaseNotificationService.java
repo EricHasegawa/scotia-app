@@ -1,7 +1,17 @@
 package com.example.scotia_app;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
+import androidx.core.app.NotificationCompat;
+
+import com.example.scotia_app.ui.BottomNavigationActivity;
+import com.example.scotia_app.ui.LoginActivity;
+import com.example.scotia_app.ui.MainActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.firebase.auth.FirebaseAuth;
@@ -15,45 +25,31 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-
-        // Check if message contains a data payload.
-        if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-            handleNotification();
-
-//            if (/* Check if data needs to be processed by long running job */ true) {
-//                // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
-//                scheduleJob();
-//            } else {
-//                // Handle message within 10 seconds
-//                handleNow();
-//            }
-
-        }
-
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-        }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
-        showInAppUpdate();
-    }
-
-    /**
-     * Takes the user to the appropriate order which this notification corresponds to
-     */
-    private void handleNotification() {
-        System.out.println("Welcome to order X's info page");
+        handleNotification(remoteMessage);
     }
 
     /**
      * Shows a small pop-up banner in the app to indicate that the order which is specified in the
      * notification has now been updated
      */
-    private void showInAppUpdate() {
-        System.out.println("Blah blah happened to order X");
+    private void handleNotification(RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+        Log.d("msg", "onMessageReceived: " + remoteMessage.getData().get("message"));
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        String channelId = "Default";
+        NotificationCompat.Builder builder = new  NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_stat_ic_notification)
+                .setColor(getColor(R.color.colorPrimary))
+                .setContentTitle(remoteMessage.getNotification().getTitle())
+                .setContentText(remoteMessage.getNotification().getBody()).setAutoCancel(true).setContentIntent(pendingIntent);
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId, "Default channel", NotificationManager.IMPORTANCE_DEFAULT);
+            manager.createNotificationChannel(channel);
+        }
+        manager.notify(0, builder.build());
     }
 
     /**
@@ -79,6 +75,5 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
         String user_id = "";
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
         url += "register-device-id?uid=" + user_id + "&device_id=" + token;
-//        new NotificationTokenFetcher()
     }
 }

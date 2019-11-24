@@ -22,7 +22,7 @@
 
 <!--Invoices Fragment-->
     <string name="invoices_placeholder">Please tap on \"Invoices\" again.</string>
-    <string name="tab_past">Past</string>
+    <string name="tab_completed">Completed</string>
     <string name="tab_upcoming">Upcoming</string>
 
 <!--Notification Fragment-->

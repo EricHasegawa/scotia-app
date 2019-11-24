@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.data.model.Persona;
+import com.example.scotia_app.data.model.Status;
 import com.example.scotia_app.data.model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -26,40 +27,48 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         User user = getIntent().getParcelableExtra("user");
         Invoice invoice = getIntent().getParcelableExtra("invoice");
+
         setContentView(R.layout.activity_detailed_invoice);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        assert invoice != null;
+        getSupportActionBar().setTitle("Invoice #" + invoice.getDisplayId());
+
         configureBackButton();
+
         assert user != null;
         configureConfirmButton(invoice, user);
 
         ProgressBar progressBar = findViewById(R.id.progressBar);
-        String curr_state = invoice.getStatus();
-        if (curr_state.equals("ISSUED")) {
-            progressBar.setProgress(33);
-        } else if (curr_state.equals("PENDING")) {
-            progressBar.setProgress(66);
-        } else {
-            progressBar.setProgress(100);
+        switch (invoice.getStatus()) {
+            case ISSUED:
+                progressBar.setProgress(25);
+            case PENDING:
+                progressBar.setProgress(50);
+            case PAID:
+                progressBar.setProgress(75);
+            case DELIVERED:
+                progressBar.setProgress(100);
         }
 
         TextView invoiceId = findViewById(R.id.invoiceId);
-        invoiceId.append("Invoice ID: " + invoice.getInvoice_id());
+        invoiceId.append("Invoice ID: " + invoice.getId());
 
         TextView customerId = findViewById(R.id.customerId);
-        customerId.append("Customer ID: " + invoice.getCustomer_id());
+        customerId.append("Customer ID: " + invoice.getCustomerName());
 
         TextView supplierId = findViewById(R.id.supplierId);
-        supplierId.append("Supplier ID: " + invoice.getSupplier_id());
+        supplierId.append("Supplier ID: " + invoice.getSupplierName());
 
         TextView driverId = findViewById(R.id.driverId);
-        driverId.append("Driver ID: " + invoice.getDriver_id());
+        driverId.append("Driver ID: " + invoice.getDriverName());
 
         TextView status = findViewById(R.id.status);
-        status.append("Order is currently " + curr_state);
+        status.append("Order has been " + invoice.getStatus());
 
         TextView total = findViewById(R.id.total);
         total.append("Total: " + invoice.getTotal());
@@ -77,20 +86,51 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     }
 
     private void configureConfirmButton(final Invoice invoice, final User user) {
-        FloatingActionButton fab = findViewById(R.id.fab_confirm);
-        if (user.getPersona() == Persona.customer) {
-            fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton confirmationButton = findViewById(R.id.fab_confirm);
+        boolean isAlreadyPaid = (user.getPersona() == Persona.customer || user.getPersona() ==
+                Persona.supplier) && invoice.getStatus() == Status.PAID;
+        boolean isAlreadyDelivered = user.getPersona() == Persona.driver &&
+                invoice.getStatus() == Status.DELIVERED;
+        boolean cannotBeDelivered = user.getPersona() == Persona.driver &&
+                invoice.getStatus() != Status.PAID;
+
+        if (isAlreadyDelivered || isAlreadyPaid || cannotBeDelivered) {
+            confirmationButton.hide();
+        } else {
+            confirmationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
-                    url += "confirm-payment?id=" + invoice.getInvoice_id();
-                    new ConfirmFetcher(DetailedInvoiceActivity.this).execute(url);
-                    Snackbar.make(view, "This order has now been confirmed.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    switch (user.getPersona()) {
+                        case supplier:
+                            confirmPayment(invoice, view);
+                        case customer:
+                            confirmPayment(invoice, view);
+                        case driver:
+                            confirmDelivery(invoice, view);
+                    }
                 }
             });
+        }
+    }
+
+    private void confirmPayment(Invoice invoice, View view) {
+        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
+        url += "confirm-payment?id=" + invoice.getId();
+        new ConfirmFetcher(DetailedInvoiceActivity.this).execute(url);
+        Snackbar.make(view, "This order has now been confirmed as PAID.", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+    }
+
+    private void confirmDelivery(Invoice invoice, View view) {
+        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
+        if (invoice.getStatus() != Status.PAID) {
+            Snackbar.make(view, "This order has not been paid for yet.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
         } else {
-            fab.hide();
+            url += "confirm-delivery?id=" + invoice.getId();
+            new ConfirmFetcher(DetailedInvoiceActivity.this).execute(url);
+            Snackbar.make(view, "This order has now been confirmed as DELIVERED.",
+                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
     }
 

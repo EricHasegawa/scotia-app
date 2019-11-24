@@ -11,11 +11,12 @@ import java.util.ArrayList;
 
 public class Invoice implements Parcelable  {
 
-    private String invoice_id;
-    private String customer_id;
-    private String supplier_id;
-    private String driver_id;
-    private String status;
+    private String id;
+    private String displayId;
+    private String customerName;
+    private String supplierName;
+    private String driverName;
+    private Status status;
     private String total;
     private ArrayList<String> orders;
 
@@ -25,11 +26,12 @@ public class Invoice implements Parcelable  {
      * @param in The data of this Invoice.
      */
     private Invoice(Parcel in) {
-        invoice_id  = in.readString();
-        customer_id = in.readString();
-        supplier_id = in.readString();
-        driver_id   = in.readString();
-        status      = in.readString();
+        id = in.readString();
+        displayId = in.readString();
+        customerName = in.readString();
+        supplierName = in.readString();
+        driverName = in.readString();
+        status      = Status.valueOf(in.readString());
         total       = in.readString();
         orders = new ArrayList<>();
         in.readStringList(orders);
@@ -41,11 +43,12 @@ public class Invoice implements Parcelable  {
      */
     public Invoice (JSONObject invoiceData) {
         try {
-            this.invoice_id = invoiceData.getString("invoice_id");
-            this.customer_id = invoiceData.getString("customer_id");
-            this.supplier_id = invoiceData.getString("supplier_id");
-            this.driver_id = invoiceData.getString("driver_id");
-            this.status = invoiceData.getString("status");
+            this.id = invoiceData.getString("invoice_id");
+            this.displayId = invoiceData.getString("invoice_id_short");
+            this.customerName = invoiceData.getString("customer_name");
+            this.supplierName = invoiceData.getString("supplier_name");
+            this.driverName = invoiceData.getString("driver_name");
+            this.status = Status.valueOf(invoiceData.getString("status"));
             this.total = invoiceData.getString("total");
             JSONArray array = invoiceData.getJSONArray("orders");
             orders = new ArrayList<>();
@@ -85,32 +88,37 @@ public class Invoice implements Parcelable  {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(invoice_id);
-        dest.writeString(customer_id);
-        dest.writeString(supplier_id);
-        dest.writeString(driver_id);
-        dest.writeString(status);
+        dest.writeString(id);
+        dest.writeString(displayId);
+        dest.writeString(customerName);
+        dest.writeString(supplierName);
+        dest.writeString(driverName);
+        dest.writeString(status.toString());
         dest.writeString(total);
         dest.writeStringList(orders);
     }
 
-    public String getInvoice_id() {
-        return invoice_id;
+    public String getId() {
+        return id;
     }
 
-    public String getCustomer_id() {
-        return customer_id;
+    public String getDisplayId() {
+        return displayId;
     }
 
-    public String getSupplier_id() {
-        return supplier_id;
+    public String getCustomerName() {
+        return customerName;
     }
 
-    public String getDriver_id() {
-        return driver_id;
+    public String getSupplierName() {
+        return supplierName;
     }
 
-    public String getStatus() {
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public Status getStatus() {
         return status;
     }
 

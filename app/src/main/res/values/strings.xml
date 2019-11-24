@@ -1,7 +1,7 @@
 <resources>
 
 <!--Titles-->
-    <string name="app_name">Scotiabank RTP</string>
+    <string name="app_name">RequestToPay</string>
     <string name="title_persona_selector">Select Persona</string>
     <string name="title_invoices">Invoices</string>
     <string name="title_notifications">Notifications</string>

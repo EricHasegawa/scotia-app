@@ -59,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                             .createSignInIntentBuilder()
                             .setAvailableProviders(providers)
                             .setLogo(R.drawable.logo1)
+                            .setTheme(R.style.AppTheme_NoActionBar)
                             .build(),
                     123);
 

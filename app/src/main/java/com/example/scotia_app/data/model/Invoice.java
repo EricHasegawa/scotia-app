@@ -130,4 +130,14 @@ public class Invoice implements Parcelable  {
         return orders;
     }
 
+    public String setStatusUrl(Status status) {
+        this.status = status;
+
+        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/update-invoice-status?";
+        url += "id=" + getId() + "&status=" + status.toString();
+
+        System.out.println(url);
+        return url;
+    }
+
 }

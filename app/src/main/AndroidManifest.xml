@@ -11,7 +11,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/pink"
+        android:networkSecurityConfig="@xml/network_security_config">
 
         <service
             android:name=".FirebaseNotificationService"
@@ -32,24 +33,19 @@
         <activity
             android:name=".ui.invoices.DetailedInvoiceActivity"
             android:label="@string/title_activity_detailed_invoice"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/pink.NoActionBar" />
 
         <activity
             android:name=".ui.BottomNavigationActivity"
-            android:label="@string/title_activity_bottom_navigation" />
-
-        <activity
-            android:name=".ui.MainActivity"
-            android:label="@string/title_persona_selector" />
+            android:label="@string/title_activity_bottom_navigation"/>
 
         <activity android:name=".ui.LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/pink.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

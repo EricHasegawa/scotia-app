@@ -9,6 +9,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavArgument;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -43,10 +44,7 @@ public class BottomNavigationActivity extends AppCompatActivity {
         NavInflater navInflater = navController.getNavInflater();
         NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
 
-        passUserToAllFragments(navGraph, navController);
-
-        navGraph.setStartDestination(R.id.navigation_notifications);
-        navController.setGraph(navGraph);
+        passUserToFragments(navGraph, navController);
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -56,27 +54,31 @@ public class BottomNavigationActivity extends AppCompatActivity {
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
-
-        passUserInitially(navController);
     }
 
     /**
      * Helper method to setNavGraph which passes the current user to all the fragments for the
-     * initial load
+     * initial load and then every time the fragment is changed
      */
-    private void passUserInitially(NavController navController) {
+    private void passUserToFragments(NavGraph navGraph, NavController navController) {
         Bundle bundle = new Bundle();
         bundle.putParcelable("user", user);
-        navController.navigate(R.id.navigation_invoices, bundle);
-        navController.navigate(R.id.navigation_profile, bundle);
-        navController.navigate(R.id.navigation_notifications, bundle);
+
+        setPassUserOnChange(navGraph, navController);
+
+        navGraph.setStartDestination(R.id.navigation_profile);
+        navController.setGraph(navGraph, bundle);
+        navGraph.setStartDestination(R.id.navigation_invoices);
+        navController.setGraph(navGraph, bundle);
+        navGraph.setStartDestination(R.id.navigation_notifications);
+        navController.setGraph(navGraph, bundle);
     }
 
     /**
      * Helper method to setNavGraph which passes the current user to all the fragments whenever the
      * destination is changed since the selected fragment is recreated on each destination change
      */
-    private void passUserToAllFragments(NavGraph navGraph, final NavController navController) {
+    private void setPassUserOnChange(NavGraph navGraph, final NavController navController) {
         final NavArgument userArgument = new NavArgument.Builder().setDefaultValue(user).build();
         navGraph.addArgument("user", userArgument);
 

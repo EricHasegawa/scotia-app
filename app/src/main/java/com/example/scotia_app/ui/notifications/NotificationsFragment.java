@@ -73,7 +73,7 @@ public class NotificationsFragment extends Fragment {
                     try {
                         String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
                         url += "get-invoice?id=" +
-                                notifications.getJSONObject(0).getString("invoice_id");
+                                notifications.getJSONObject(position).getString("invoice_id");
                         new InvoiceFetcher(getActivity()).execute(url);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -91,9 +91,7 @@ public class NotificationsFragment extends Fragment {
         textView.setText(null);
         listView.setAdapter(null);
 
-        if (this.user != null) {
-            new NotificationFetcher(this.getActivity()).execute(user.getNotificationURL());
-        }
+        new NotificationFetcher(this.getActivity()).execute(user.getNotificationURL());
     }
 
     /**
@@ -180,7 +178,7 @@ public class NotificationsFragment extends Fragment {
             Invoice invoice = new Invoice(invoiceJson);
             showDetailedInvoice.putExtra("invoice", invoice);
             showDetailedInvoice.putExtra("user", user);
-            super.getActivityWeakReference().get().getApplicationContext().startActivity(showDetailedInvoice);
+            super.getActivityWeakReference().get().startActivity(showDetailedInvoice);
         }
     }
 

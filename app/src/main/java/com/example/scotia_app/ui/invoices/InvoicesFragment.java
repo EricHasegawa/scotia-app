@@ -188,14 +188,15 @@ public class InvoicesFragment extends Fragment {
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
 
+            System.out.println(invoices.length());
+
             if (invoices.length() == 0) {
                 TabLayout tabLayout = context.findViewById(R.id.filter_tabs);
                 int tabNumber = tabLayout.getSelectedTabPosition();
                 if (tabNumber == UPCOMING) {
-                    textView.setText("You have no\nupcoming orders.");
+                    textView.setText(context.getString(R.string.placeholder_upcoming));
                 } else {
-                    textView.setText("You have no past orders.\nWelcome to " +
-                            context.getString(R.string.app_name));
+                    textView.setText(context.getString(R.string.placeholder_completed));
                 }
                 textView.setVisibility(View.VISIBLE);
             } else {
@@ -249,6 +250,8 @@ public class InvoicesFragment extends Fragment {
                 // Sets text color to green if invoice has been paid or delivered
                 if (paidOrDelivered) {
                     textStatus.setTextColor(context.getResources().getColor(R.color.lightGreen, null));
+                } else {
+                    textStatus.setTextColor(context.getResources().getColor(R.color.colorPrimaryDark, null));
                 }
 
             } catch (JSONException e) {

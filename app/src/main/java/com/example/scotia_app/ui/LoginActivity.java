@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                             .createSignInIntentBuilder()
                             .setAvailableProviders(providers)
                             .setLogo(R.drawable.logo1)
-                            .setTheme(R.style.AppTheme_NoActionBar)
+                            .setTheme(R.style.pink_NoActionBar)
                             .build(),
                     123);
 
@@ -150,6 +150,8 @@ public class LoginActivity extends AppCompatActivity {
             final Intent switchToBottomNavigationView = new Intent(context,
                     BottomNavigationActivity.class);
 
+            getActivityWeakReference().get().finish();
+
             try {
                 putUserInfo(userData, context, switchToBottomNavigationView);
             } catch (JSONException | NullPointerException e) {
@@ -232,7 +234,8 @@ public class LoginActivity extends AppCompatActivity {
          * @param address the address of the user being stored in the database.
          */
         private void saveUserInfo(String id, String type, String name, String email, @Nullable String address) {
-            String urlStr = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id=" + id + "&type=" + type + "&name=" + name + "&email=" + email;
+            String urlStr = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id="
+                    + id + "&type=" + type + "&name=" + name + "&email=" + email;
             if (address != null) {
                 urlStr += "&address=" + address;
             }

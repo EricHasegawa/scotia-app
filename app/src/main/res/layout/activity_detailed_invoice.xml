@@ -18,6 +18,22 @@
         app:titleTextColor="@color/white" />
 
     <ProgressBar
+        android:id="@+id/progressBarBackground"
+        style="?android:progressBarStyleHorizontal"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:progress="100"
+        android:layout_marginTop="24dp"
+        android:progressDrawable="@drawable/circle"
+        app:layout_constraintBottom_toTopOf="@+id/invoiceId"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:progressTint="@color/lightPink"
+        android:progressTintMode="src_atop"/>
+
+    <ProgressBar
         android:id="@+id/progressBar"
         style="?android:progressBarStyleHorizontal"
         android:layout_width="300dp"
@@ -28,7 +44,9 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:progressTint="@color/colorPrimaryDark"
+        android:progressTintMode="src_atop"/>
 
     <TextView
         android:id="@+id/status"

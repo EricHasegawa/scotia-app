@@ -31,7 +31,6 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private Invoice invoice;
     private User user;
-    private FloatingActionButton confirmButton;
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -56,14 +55,13 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
         this.invoice = getIntent().getParcelableExtra("invoice");
         this.user = getIntent().getParcelableExtra("user");
-        this.confirmButton = findViewById(R.id.fab_confirm);
 
         setContentView(R.layout.activity_detailed_invoice);
 
         setToolbarTitle();
         configureBackButton();
         configureConfirmButton();
-        setProgressBar();
+        updateProgressBar();
         setTextViews();
     }
 
@@ -103,7 +101,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         addressTextView.append("Address: " + invoice.getAddress());
     }
 
-    private void setProgressBar() {
+    private void updateProgressBar() {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         Status status = invoice.getStatus();
         if (status == Status.ISSUED) {
@@ -136,16 +134,15 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private void configureConfirmButton() {
         final FloatingActionButton confirmationButton = findViewById(R.id.fab_confirm);
-        boolean isAlreadyPaid = (user.getPersona() == Persona.customer || user.getPersona() ==
-                Persona.supplier) && invoice.getStatus() == Status.PAID;
-        boolean isAlreadyDelivered = user.getPersona() == Persona.driver &&
-                invoice.getStatus() == Status.DELIVERED;
-        boolean cannotBeDelivered = user.getPersona() == Persona.driver &&
-                invoice.getStatus() != Status.PAID;
+        boolean isNotAlreadyDelivered = invoice.getStatus() != Status.DELIVERED;
+        boolean isIssued = user.getPersona() == Persona.supplier && invoice.getStatus() ==
+                Status.ISSUED;
+        boolean isPending = (user.getPersona() == Persona.customer || user.getPersona() ==
+                Persona.supplier) && invoice.getStatus() == Status.PENDING;
+        boolean isPaid = user.getPersona() == Persona.driver &&
+                invoice.getStatus() == Status.PAID;
 
-        if (isAlreadyDelivered || isAlreadyPaid || cannotBeDelivered) {
-            confirmationButton.hide();
-        } else {
+        if (isNotAlreadyDelivered && (isPending || isIssued || isPaid)) {
             confirmationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -159,6 +156,8 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                     }
                 }
             });
+        } else {
+            confirmationButton.hide();
         }
     }
 
@@ -169,6 +168,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                     .setAction("Action", null).show();
             TextView status = findViewById(R.id.status);
             status.setText(Status.PENDING.toString());
+            updateProgressBar();
         } else {
             confirmPayment(view);
         }
@@ -180,7 +180,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                 .setAction("Action", null).show();
         TextView status = findViewById(R.id.status);
         status.setText(Status.PAID.toString());
+        FloatingActionButton confirmButton = findViewById(R.id.fab_confirm);
         confirmButton.hide();
+        updateProgressBar();
     }
 
     private void confirmDelivery(View view) {
@@ -193,7 +195,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                     Snackbar.LENGTH_LONG).setAction("Action", null).show();
             TextView status = findViewById(R.id.status);
             status.setText(Status.DELIVERED.toString());
+            FloatingActionButton confirmButton = findViewById(R.id.fab_confirm);
             confirmButton.hide();
+            updateProgressBar();
         }
     }
 }

@@ -44,6 +44,8 @@ public class NotificationsFragment extends Fragment {
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            loadNotifications(getView());
+
             String title = intent.getStringExtra("title");
             String message = intent.getStringExtra("message");
 

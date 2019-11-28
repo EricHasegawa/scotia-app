@@ -1,5 +1,10 @@
 package com.example.scotia_app.ui.invoices;
 
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import com.example.scotia_app.OutgoingRequestFetcher;
@@ -12,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.view.View;
 import android.widget.ProgressBar;
@@ -26,10 +32,27 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     private Invoice invoice;
     private User user;
     private FloatingActionButton confirmButton;
+    private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String title = intent.getStringExtra("title");
+            String message = intent.getStringExtra("message");
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(DetailedInvoiceActivity.this);
+            builder.setTitle(title);
+            builder.setMessage(message);
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(notificationHandler,
+                new IntentFilter(getString(R.string.notification_intent_filter)));
 
         this.invoice = getIntent().getParcelableExtra("invoice");
         this.user = getIntent().getParcelableExtra("user");
@@ -42,6 +65,19 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         configureConfirmButton();
         setProgressBar();
         setTextViews();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(notificationHandler,
+                new IntentFilter(getString(R.string.notification_intent_filter)));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationHandler);
     }
 
     private void setTextViews() {

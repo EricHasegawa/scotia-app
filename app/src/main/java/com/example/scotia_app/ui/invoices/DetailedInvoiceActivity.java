@@ -1,9 +1,8 @@
 package com.example.scotia_app.ui.invoices;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-import com.example.scotia_app.DataFetcher;
+import com.example.scotia_app.OutgoingRequestFetcher;
 import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.data.model.Persona;
 import com.example.scotia_app.data.model.Status;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 
 import com.example.scotia_app.R;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class DetailedInvoiceActivity extends AppCompatActivity {
@@ -51,7 +49,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         statusTextView.setText(invoice.getStatus().toString());
 
         TextView invoiceIdTextView = findViewById(R.id.invoiceId);
-        invoiceIdTextView.append("Invoice ID: " + invoice.getId());
+        invoiceIdTextView.append("Invoice ID: " + invoice.getDisplayId());
 
         TextView customerIdTextView = findViewById(R.id.customerId);
         customerIdTextView.append("Customer: " + invoice.getCustomerName());
@@ -64,6 +62,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
         TextView totalTextView = findViewById(R.id.total);
         totalTextView.append("Total: " + invoice.getTotal());
+
+        TextView addressTextView = findViewById(R.id.address);
+        addressTextView.append("Address: " + invoice.getAddress());
     }
 
     private void setProgressBar() {
@@ -127,7 +128,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private void confirmPendingOrPayment(View view) {
         if (invoice.getStatus() == Status.ISSUED) {
-            new ConfirmFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PENDING));
+            new OutgoingRequestFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PENDING));
             Snackbar.make(view, "This order has now been confirmed as PENDING.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             TextView status = findViewById(R.id.status);
@@ -138,7 +139,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     }
 
     private void confirmPayment(View view) {
-        new ConfirmFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PAID));
+        new OutgoingRequestFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PAID));
         Snackbar.make(view, "This order has now been confirmed as PAID.", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         TextView status = findViewById(R.id.status);
@@ -151,36 +152,12 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             Snackbar.make(view, "This order has not been paid for yet.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         } else {
-            new ConfirmFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.DELIVERED));
+            new OutgoingRequestFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.DELIVERED));
             Snackbar.make(view, "This order has now been confirmed as DELIVERED.",
                     Snackbar.LENGTH_LONG).setAction("Action", null).show();
             TextView status = findViewById(R.id.status);
             status.setText(Status.DELIVERED.toString());
             confirmButton.hide();
         }
-    }
-
-    /**
-     * Sends this device's notification id to the database
-     */
-    private static class ConfirmFetcher extends DataFetcher {
-
-        /**
-         * Initialize a new NotificationTokenFetcher, which runs in the given context.
-         *
-         * @param context The context in which this UserFetcher runs.
-         */
-        ConfirmFetcher(Activity context) {
-            super(context);
-        }
-
-        /**
-         * After super.doInBackground is finished executing, do nothing. This method is only written
-         * since it has to be overridden
-         *
-         * @param rawJsons The list of raw json strings whose first element is the user data
-         */
-        @Override
-        protected void onPostExecute(ArrayList<String> rawJsons) {  }
     }
 }

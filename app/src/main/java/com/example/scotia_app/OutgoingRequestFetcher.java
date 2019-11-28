@@ -5,16 +5,17 @@ import android.app.Activity;
 import java.util.ArrayList;
 
 /**
- * Sends this device's notification id to the database
+ * Child class of DataFetcher which has an empty body for OnPostExecute. To be used for any outgoing
+ * tasks when nothing has to be done once the outgoing task is completed.
  */
-public class NotificationTokenFetcher extends DataFetcher {
+public class OutgoingRequestFetcher extends DataFetcher {
 
     /**
      * Initialize a new NotificationTokenFetcher, which runs in the given context.
      *
      * @param context The context in which this UserFetcher runs.
      */
-    public NotificationTokenFetcher(Activity context) {
+    public OutgoingRequestFetcher(Activity context) {
         super(context);
     }
 

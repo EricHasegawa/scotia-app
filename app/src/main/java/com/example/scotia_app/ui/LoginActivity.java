@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.scotia_app.DataFetcher;
-import com.example.scotia_app.NotificationTokenFetcher;
+import com.example.scotia_app.OutgoingRequestFetcher;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.Customer;
 import com.example.scotia_app.data.model.Driver;
@@ -87,8 +87,8 @@ public class LoginActivity extends AppCompatActivity {
     private void initializeUser(String user_id) {
         sendNotificationTokenToServer(user_id);
 
-        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
-        url += "get-user-by-id?id=" + user_id;
+        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/get-user-by-id?";
+        url += "id=" + user_id;
 
         new UserFetcher(this).execute(url);
     }
@@ -114,9 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
                         url += "register-device-id?uid=" + user_id + "&device_id=" + token;
 
-                        System.out.println(user_id);
-
-                        new NotificationTokenFetcher(LoginActivity.this).execute(url);
+                        new OutgoingRequestFetcher(LoginActivity.this).execute(url);
                     }
                 });
     }

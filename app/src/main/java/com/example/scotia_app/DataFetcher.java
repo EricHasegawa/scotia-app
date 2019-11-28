@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -135,5 +137,38 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Shows this fetcher's associated view's progress bar if it has one
+     */
+    public void showProgressBar() {
+        showOrHideProgressBar(true);
+    }
+
+    /**
+     * Hides this fetcher's associated view's progress bar if it has one
+     */
+    protected void hideProgressBar() {
+        showOrHideProgressBar(false);
+    }
+
+    /**
+     * Helper method to showProgressBar and hideProgressBar which set's the visibility of this fetcher's
+     * associated view's progress bar.
+     *
+     * @param visible: whether to make the progress bar visible or not
+     */
+    private void showOrHideProgressBar(boolean visible) {
+        Activity context = activityWeakReference.get();
+        ProgressBar progressBar = context.findViewById(R.id.progressBar);
+
+        if (progressBar != null) {
+            if (!visible) {
+                progressBar.setVisibility(View.GONE);
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }

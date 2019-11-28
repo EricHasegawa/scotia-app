@@ -88,7 +88,9 @@ public class InvoicesFragment extends Fragment {
         listView.setAdapter(null);
 
         if (this.user != null) {
-            new InvoicesFetcher(this.getActivity()).execute(user.getInvoiceURL(filter));
+            InvoicesFetcher invoicesFetcher = new InvoicesFetcher(getActivity());
+            invoicesFetcher.showProgressBar();
+            invoicesFetcher.execute(user.getInvoiceURL(filter));
         }
     }
 
@@ -170,6 +172,7 @@ public class InvoicesFragment extends Fragment {
 
                 showPlaceholder(context);
                 refreshInvoicesList(context);
+                hideProgressBar();
 
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -228,10 +231,10 @@ public class InvoicesFragment extends Fragment {
             return 0;
         }
 
-        @SuppressLint("ViewHolder")
+        @SuppressLint({"ViewHolder"})
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            view = LayoutInflater.from(context).inflate(R.layout.invoice_layout, null);
+            view = LayoutInflater.from(context).inflate(R.layout.invoice_layout, viewGroup, false);
 
             TextView textId = view.findViewById(R.id.textView_id);
             TextView textStatus = view.findViewById(R.id.textView_status);

@@ -18,6 +18,7 @@ public class Invoice implements Parcelable  {
     private String driverName;
     private Status status;
     private String total;
+    private String address;
     private ArrayList<String> orders;
 
     /**
@@ -31,8 +32,9 @@ public class Invoice implements Parcelable  {
         customerName = in.readString();
         supplierName = in.readString();
         driverName = in.readString();
-        status      = Status.valueOf(in.readString());
-        total       = in.readString();
+        status = Status.valueOf(in.readString());
+        total = in.readString();
+        address = in.readString();
         orders = new ArrayList<>();
         in.readStringList(orders);
     }
@@ -50,6 +52,7 @@ public class Invoice implements Parcelable  {
             this.driverName = invoiceData.getString("driver_name");
             this.status = Status.valueOf(invoiceData.getString("status"));
             this.total = invoiceData.getString("total");
+            this.address = invoiceData.getString("address");
             JSONArray array = invoiceData.getJSONArray("orders");
             orders = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
@@ -95,6 +98,7 @@ public class Invoice implements Parcelable  {
         dest.writeString(driverName);
         dest.writeString(status.toString());
         dest.writeString(total);
+        dest.writeString(address);
         dest.writeStringList(orders);
     }
 
@@ -126,6 +130,10 @@ public class Invoice implements Parcelable  {
         return total;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
     public ArrayList<String> getOrders() {
         return orders;
     }
@@ -136,8 +144,6 @@ public class Invoice implements Parcelable  {
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/update-invoice-status?";
         url += "id=" + getId() + "&status=" + status.toString();
 
-        System.out.println(url);
         return url;
     }
-
 }

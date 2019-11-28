@@ -2,8 +2,11 @@ package com.example.scotia_app.ui.notifications;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.scotia_app.DataFetcher;
 import com.example.scotia_app.data.model.Invoice;
@@ -37,11 +41,40 @@ public class NotificationsFragment extends Fragment {
      * A List of JSONs corresponding to notifications to populate the notification page's ListView.
      */
     private static JSONArray notifications = new JSONArray();
+    private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String title = intent.getStringExtra("title");
+            String message = intent.getStringExtra("message");
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+            builder.setTitle(title);
+            builder.setMessage(message);
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LocalBroadcastManager.getInstance(this.requireActivity()).registerReceiver(notificationHandler,
+                new IntentFilter(getString(R.string.notification_intent_filter)));
         setUser();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this.requireActivity()).registerReceiver(notificationHandler,
+                new IntentFilter(getString(R.string.notification_intent_filter)));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this.requireActivity()).unregisterReceiver(notificationHandler);
     }
 
     @Override
@@ -63,7 +96,7 @@ public class NotificationsFragment extends Fragment {
     /**
      * Shows the Detailed Invoice Activity corresponding to the tapped Invoice
      */
-    private void configureShowDetailedInvoiceWhenTapped(View root) {
+    private void configureShowDetailedInvoiceWhenTapped(final View root) {
         final ListView listView = root.findViewById(R.id.notifications_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -74,7 +107,11 @@ public class NotificationsFragment extends Fragment {
                         String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
                         url += "get-invoice?id=" +
                                 notifications.getJSONObject(position).getString("invoice_id");
-                        new InvoiceFetcher(getActivity()).execute(url);
+
+                        InvoiceFetcher invoiceFetcher = new InvoiceFetcher(getActivity());
+                        invoiceFetcher.showProgressBar();
+                        invoiceFetcher.execute(url);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -91,7 +128,9 @@ public class NotificationsFragment extends Fragment {
         textView.setText(null);
         listView.setAdapter(null);
 
-        new NotificationFetcher(this.getActivity()).execute(user.getNotificationURL());
+        NotificationFetcher notificationFetcher = new NotificationFetcher(getActivity());
+        notificationFetcher.showProgressBar();
+        notificationFetcher.execute(user.getNotificationURL());
     }
 
     /**
@@ -121,6 +160,7 @@ public class NotificationsFragment extends Fragment {
                 notifications = createJSONObjects(rawJsons.get(0));
                 AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
 
+                hideProgressBar();
                 showPlaceholder(context);
                 refreshInvoicesList(context);
 
@@ -178,6 +218,7 @@ public class NotificationsFragment extends Fragment {
             Invoice invoice = new Invoice(invoiceJson);
             showDetailedInvoice.putExtra("invoice", invoice);
             showDetailedInvoice.putExtra("user", user);
+            hideProgressBar();
             super.getActivityWeakReference().get().startActivity(showDetailedInvoice);
         }
     }
@@ -205,10 +246,10 @@ public class NotificationsFragment extends Fragment {
             return 0;
         }
 
-        @SuppressLint("ViewHolder")
+        @SuppressLint({"ViewHolder"})
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            view = LayoutInflater.from(context).inflate(R.layout.notification_layout, null);
+            view = LayoutInflater.from(context).inflate(R.layout.notification_layout, viewGroup, false);
 
             if (i % 2 == 0) {
                 view.setBackgroundColor(context.getColor(R.color.white));

@@ -40,6 +40,7 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
     }
 
     protected DataFetcher(Activity context, String idToken) {
+        activityWeakReference = new WeakReference<>(context);
         DataFetcher.idToken = idToken;
     }
 

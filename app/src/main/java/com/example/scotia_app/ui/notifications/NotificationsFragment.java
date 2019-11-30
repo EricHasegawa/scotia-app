@@ -206,6 +206,8 @@ public class NotificationsFragment extends Fragment {
             super(context);
         }
 
+        InvoiceFetcher(Activity context, String idToken) { super(context, idToken); }
+
         /**
          * After super.doInBackground is finished executing, store the JSONObjects corresponding to
          * the raw strings in rawJsons in invoices, and populate the ListView with formatted strings

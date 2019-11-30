@@ -231,9 +231,9 @@ public class InvoicesFragment extends Fragment {
                 } else {
                     textView.setText(context.getString(R.string.placeholder_completed));
                 }
-                textView.setVisibility(View.VISIBLE);
+                //textView.setVisibility(View.VISIBLE);
             } else {
-                textView.setVisibility(View.GONE);
+                //textView.setVisibility(View.GONE);
             }
         }
     }

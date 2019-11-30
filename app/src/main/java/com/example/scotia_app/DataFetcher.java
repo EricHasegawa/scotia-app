@@ -23,6 +23,8 @@ import org.json.JSONObject;
  */
 abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, ArrayList<String>> {
 
+    private static String idToken;
+
     /**
      * Weak reference to the context in which this DataFetcher runs.
      */
@@ -35,6 +37,10 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
      */
     protected DataFetcher(Activity context) {
         activityWeakReference = new WeakReference<>(context);
+    }
+
+    protected DataFetcher(Activity context, String idToken) {
+        DataFetcher.idToken = idToken;
     }
 
     /**
@@ -53,7 +59,10 @@ abstract public class DataFetcher extends AsyncTask<String, ArrayList<String>, A
                 url = new URL(urlStr);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
+                connection.setRequestProperty("Authorization", "Bearer " + DataFetcher.idToken);
                 connection.setRequestProperty("accept", "text/html");
+                String token = DataFetcher.idToken;
+                String response = connection.getResponseMessage();
                 rawJsonStrings.add(fetchText(connection));
             }
             return rawJsonStrings;

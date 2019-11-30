@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -43,12 +44,14 @@ import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private String idToken;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         FirebaseApp.initializeApp(this);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             List<AuthUI.IdpConfig> providers = Arrays.asList(
                     new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -64,7 +67,15 @@ public class LoginActivity extends AppCompatActivity {
                     123);
 
         } else {
-            initializeUser(user.getUid());
+            user.getIdToken(true)
+                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        public void onComplete(@NonNull Task<GetTokenResult> task) {
+                            if (task.isSuccessful()) {
+                                idToken = task.getResult().getToken();
+                                initializeUser(user.getUid());
+                            }
+                        }
+                    });
         }
     }
 
@@ -90,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/get-user-by-id?";
         url += "id=" + user_id;
 
-        new UserFetcher(this).execute(url);
+        new UserFetcher(this, idToken).execute(url);
     }
 
     /**
@@ -134,6 +145,8 @@ public class LoginActivity extends AppCompatActivity {
         UserFetcher(Activity context) {
             super(context);
         }
+
+        UserFetcher(Activity context, String idToken) { super(context, idToken); }
 
         /**
          * After super.doInBackground is finished executing, populate a user with the retrieved JSON

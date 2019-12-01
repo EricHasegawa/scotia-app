@@ -52,6 +52,7 @@
 
     <TextView
         android:id="@+id/status"
+        android:textColor="#000000"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -65,6 +66,7 @@
 
     <TextView
         android:id="@+id/invoiceId"
+        android:textColor="#000000"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -77,6 +79,7 @@
 
     <TextView
         android:id="@+id/customerId"
+        android:textColor="#000000"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -89,6 +92,7 @@
 
     <TextView
         android:id="@+id/supplierId"
+        android:textColor="#000000"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -101,6 +105,7 @@
 
     <TextView
         android:id="@+id/driverId"
+        android:textColor="#000000"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -113,6 +118,7 @@
 
     <TextView
         android:id="@+id/total"
+        android:textColor="#000000"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -125,6 +131,7 @@
 
     <TextView
         android:id="@+id/address"
+        android:textColor="#000000"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"

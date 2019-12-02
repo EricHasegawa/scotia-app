@@ -19,12 +19,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.scotia_app.R;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class DetailedInvoiceActivity extends AppCompatActivity {
@@ -99,6 +103,17 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
         TextView addressTextView = findViewById(R.id.address);
         addressTextView.append("Address: " + invoice.getAddress());
+
+        TextView ordersHeaderTextView = findViewById(R.id.ordersHeader);
+        ordersHeaderTextView.append("Orders:");
+
+        TextView ordersTextView = findViewById(R.id.orders);
+        ArrayList<String> orders = new ArrayList<String>();
+        orders =invoice.getOrders();
+        for (int i = 0; i < orders.size(); i++) {
+            ordersTextView.append("- " + orders.get(i) + "\n");
+        }
+
     }
 
     private void updateProgressBar() {

@@ -19,10 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.text.SpannableString;
-import android.text.style.RelativeSizeSpan;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -149,7 +146,6 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private void configureConfirmButton() {
         final FloatingActionButton confirmationButton = findViewById(R.id.fab_confirm);
-        boolean isNotAlreadyDelivered = invoice.getStatus() != Status.DELIVERED;
         boolean isIssued = user.getPersona() == Persona.supplier && invoice.getStatus() ==
                 Status.ISSUED;
         boolean isPending = (user.getPersona() == Persona.customer || user.getPersona() ==
@@ -157,7 +153,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         boolean isPaid = user.getPersona() == Persona.driver &&
                 invoice.getStatus() == Status.PAID;
 
-        if (isNotAlreadyDelivered && (isPending || isIssued || isPaid)) {
+        if (isPending || isIssued || isPaid) {
             confirmationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

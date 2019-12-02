@@ -93,7 +93,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         customerIdTextView.append("Customer: " + invoice.getCustomerName());
 
         TextView supplierIdTextView = findViewById(R.id.supplierId);
-        supplierIdTextView.append("Supplier: " + invoice.getSupplierName());
+        supplierIdTextView.append(invoice.getSupplierName());
 
         TextView driverIdTextView = findViewById(R.id.driverId);
         driverIdTextView.append("Driver: " + invoice.getDriverName());

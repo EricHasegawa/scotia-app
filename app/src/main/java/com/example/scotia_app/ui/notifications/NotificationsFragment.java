@@ -251,6 +251,7 @@ public class NotificationsFragment extends Fragment {
         }
 
         @SuppressLint({"ViewHolder"})
+
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             view = LayoutInflater.from(context).inflate(R.layout.notification_layout, viewGroup, false);

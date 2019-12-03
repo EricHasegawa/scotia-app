@@ -77,8 +77,8 @@ public class InvoicesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_invoices, container, false);
-        configureShowDetailedInvoiceWhenTapped(root);
-        configureTabClicked(root);
+        showDetailed(root);
+        configureTab(root);
         return root;
     }
 
@@ -127,7 +127,7 @@ public class InvoicesFragment extends Fragment {
     /**
      * Shows the Detailed Invoice Activity corresponding to the tapped Invoice
      */
-    private void configureShowDetailedInvoiceWhenTapped(View root) {
+    private void showDetailed(View root) {
         final ListView listView = root.findViewById(R.id.invoices_list);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -150,7 +150,7 @@ public class InvoicesFragment extends Fragment {
         });
     }
 
-    private void configureTabClicked(final View root) {
+    private void configureTab(final View root) {
         final TabLayout tabLayout = root.findViewById(R.id.filter_tabs);
         Objects.requireNonNull(tabLayout.getTabAt(1)).select();
         tabLayout.setBackgroundColor(getContext().getColor(R.color.white));
@@ -231,13 +231,11 @@ public class InvoicesFragment extends Fragment {
                 } else {
                     textView.setText(context.getString(R.string.placeholder_completed));
                 }
-                //textView.setVisibility(View.VISIBLE);
-            } else {
-                //textView.setVisibility(View.GONE);
             }
         }
     }
 
+     // Allows invoices to be properly manipulated and displayed
     private static class InvoiceAdapter extends BaseAdapter {
 
         private Context context;
@@ -260,8 +258,8 @@ public class InvoicesFragment extends Fragment {
         public long getItemId(int i) {
             return 0;
         }
-
         @SuppressLint({"ViewHolder"})
+
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             view = LayoutInflater.from(context).inflate(R.layout.invoice_layout, viewGroup, false);

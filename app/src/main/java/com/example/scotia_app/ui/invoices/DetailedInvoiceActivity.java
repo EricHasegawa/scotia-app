@@ -79,6 +79,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationHandler);
     }
 
+    // Displays all of the detailed invoice information via textViews.
     private void setTextViews() {
         TextView statusTextView = findViewById(R.id.status);
         statusTextView.setText(invoice.getStatus().toString());
@@ -144,6 +145,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         }
     }
 
+    // Allows users to confirm the states/status of a given delivery.
     private void configureConfirmButton() {
         final FloatingActionButton confirmationButton = findViewById(R.id.fab_confirm);
         boolean isIssued = user.getPersona() == Persona.supplier && invoice.getStatus() ==

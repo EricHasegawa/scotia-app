@@ -1,7 +1,7 @@
 <resources>
 
 <!--General-->
-    <string name="app_name">RequestToPay</string>
+    <string name="app_name">RTP</string>
     <string name="package_name">com.example.scotia_app</string>
     <string name="notification_intent_filter">com.example.scotia_app-NOTIFICATION</string>
 

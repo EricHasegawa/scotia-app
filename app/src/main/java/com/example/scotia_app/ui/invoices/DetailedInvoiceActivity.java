@@ -161,18 +161,25 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         boolean isPaid = user.getPersona() == Persona.driver &&
                 invoice.getStatus() == Status.PAID;
 
-        if (isPending || isIssued || isPaid) {
+        if (isIssued) {
             confirmationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    switch (user.getPersona()) {
-                        case supplier:
-                            confirmPendingOrPayment(view);
-                        case customer:
-                            confirmPayment(view);
-                        case driver:
-                            confirmDelivery(view);
-                    }
+                    setStatus(Status.PENDING, view);
+                }
+            });
+        } else if (isPending) {
+            confirmationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setStatus(Status.PAID, view);
+                }
+            });
+        } else if (isPaid) {
+            confirmationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setStatus(Status.DELIVERED, view);
                 }
             });
         } else {
@@ -180,43 +187,12 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         }
     }
 
-    private void confirmPendingOrPayment(View view) {
-        if (invoice.getStatus() == Status.ISSUED) {
-            new OutgoingRequest(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PENDING));
-            Snackbar.make(view, "This order has now been confirmed as PENDING.", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            TextView status = findViewById(R.id.status);
-            status.setText(Status.PENDING.toString());
-            updateProgressBar();
-        } else {
-            confirmPayment(view);
-        }
-    }
-
-    private void confirmPayment(View view) {
-        new OutgoingRequest(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PAID));
-        Snackbar.make(view, "This order has now been confirmed as PAID.", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-        TextView status = findViewById(R.id.status);
-        status.setText(Status.PAID.toString());
-        FloatingActionButton confirmButton = findViewById(R.id.fab_confirm);
-        confirmButton.hide();
+    private void setStatus(Status status, View view) {
+        new OutgoingRequest(this).execute(invoice.setStatusUrl(status));
+        Snackbar.make(view, "This order has now been confirmed as PENDING.",
+                Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        TextView statusText = findViewById(R.id.status);
+        statusText.setText(status.toString());
         updateProgressBar();
-    }
-
-    private void confirmDelivery(View view) {
-        if (invoice.getStatus() != Status.PAID) {
-            Snackbar.make(view, "This order has not been paid for yet.", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        } else {
-            new OutgoingRequest(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.DELIVERED));
-            Snackbar.make(view, "This order has now been confirmed as DELIVERED.",
-                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            TextView status = findViewById(R.id.status);
-            status.setText(Status.DELIVERED.toString());
-            FloatingActionButton confirmButton = findViewById(R.id.fab_confirm);
-            confirmButton.hide();
-            updateProgressBar();
-        }
     }
 }

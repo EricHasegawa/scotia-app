@@ -126,11 +126,8 @@ public class NotificationsFragment extends Fragment {
 
     private void loadNotifications(View root) {
         final ListView listView = root.findViewById(R.id.notifications_list);
-        TextView textView = root.findViewById(R.id.textView_placeholder);
 
-        textView.setText(null);
         listView.setAdapter(null);
-
         NotificationFetcher notificationFetcher = new NotificationFetcher(getActivity());
         notificationFetcher.showProgressBar();
         notificationFetcher.execute(user.getNotificationURL());
@@ -183,7 +180,6 @@ public class NotificationsFragment extends Fragment {
 
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
-            textView.setVisibility(View.VISIBLE);
 
             if (notifications.length() == 0) {
                 textView.setVisibility(View.VISIBLE);

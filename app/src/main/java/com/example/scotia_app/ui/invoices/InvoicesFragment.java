@@ -221,15 +221,15 @@ public class InvoicesFragment extends Fragment {
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
 
-            System.out.println(invoices.length());
-
             if (invoices.length() == 0) {
+                textView.setVisibility(View.VISIBLE);
+
                 TabLayout tabLayout = context.findViewById(R.id.filter_tabs);
                 int tabNumber = tabLayout.getSelectedTabPosition();
                 if (tabNumber == UPCOMING) {
-                    textView.setText(context.getString(R.string.placeholder_upcoming));
-                } else {
                     textView.setText(context.getString(R.string.placeholder_completed));
+                } else {
+                    textView.setText(context.getString(R.string.placeholder_upcoming));
                 }
             }
         }

@@ -21,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.scotia_app.DataFetcher;
+import com.example.scotia_app.database.DataFetcher;
 import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.User;
@@ -62,7 +62,7 @@ public class NotificationsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LocalBroadcastManager.getInstance(this.requireActivity()).registerReceiver(notificationHandler,
-                new IntentFilter(getString(R.string.notification_intent_filter)));
+                new IntentFilter(getString(R.string.notification_received)));
         setUser();
     }
 
@@ -70,7 +70,7 @@ public class NotificationsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this.requireActivity()).registerReceiver(notificationHandler,
-                new IntentFilter(getString(R.string.notification_intent_filter)));
+                new IntentFilter(getString(R.string.notification_received)));
     }
 
     @Override

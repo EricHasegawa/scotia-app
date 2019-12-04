@@ -9,6 +9,8 @@ import android.os.Bundle;
 
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.User;
+import com.example.scotia_app.database.OutgoingRequest;
+import com.example.scotia_app.ui.invoices.DetailedInvoiceActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -27,17 +29,11 @@ import androidx.navigation.ui.NavigationUI;
 public class BottomNavigationActivity extends AppCompatActivity {
 
     private User user;
-    private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
+    private BroadcastReceiver notificationTokenUpdatedHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String title = intent.getStringExtra("title");
-            String message = intent.getStringExtra("message");
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle(title);
-            builder.setMessage(message);
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            String url = intent.getStringExtra("url");
+            new OutgoingRequest(BottomNavigationActivity.this).execute(url);
         }
     };
 
@@ -49,19 +45,16 @@ public class BottomNavigationActivity extends AppCompatActivity {
         // Retrieves the current user, passed from the MainActivity
         this.user = getIntent().getParcelableExtra("user");
 
-        // Registers notification handler to enable receiving notifications when app is in foreground
-//        LocalBroadcastManager.getInstance(this).registerReceiver(notificationHandler,
-//                new IntentFilter(getString(R.string.notification_intent_filter)));
+        LocalBroadcastManager.getInstance(this).registerReceiver(notificationTokenUpdatedHandler,
+                new IntentFilter(getString(R.string.notification_token_updated)));
 
         setNavGraph();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-//        Unregisters notification handler to prevent memory leaks
-//        LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationHandler);
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationTokenUpdatedHandler);
     }
 
     /**

@@ -13,8 +13,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.scotia_app.DataFetcher;
-import com.example.scotia_app.OutgoingRequestFetcher;
+import com.example.scotia_app.database.DataFetcher;
+import com.example.scotia_app.database.OutgoingRequest;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.Customer;
 import com.example.scotia_app.data.model.Driver;
@@ -37,14 +37,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private String idToken;
+    private static String idToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +62,16 @@ public class LoginActivity extends AppCompatActivity {
                             .setAvailableProviders(providers)
                             .setLogo(R.drawable.logo1)
                             .setTheme(R.style.AppTheme_NoActionBar)
+                            .setIsSmartLockEnabled(false)
                             .build(),
                     123);
-
         } else {
             user.getIdToken(true)
                     .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                         public void onComplete(@NonNull Task<GetTokenResult> task) {
                             if (task.isSuccessful()) {
                                 idToken = task.getResult().getToken();
+                                System.out.println(idToken);
                                 initializeUser(user.getUid());
                             }
                         }
@@ -86,16 +86,25 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == 123) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                initializeUser(user.getUid());
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                user.getIdToken(true)
+                        .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                                if (task.isSuccessful()) {
+                                    idToken = task.getResult().getToken();
+                                    initializeUser(user.getUid());
+                                }
+                            }
+                        });
             } else {
-                Toast.makeText(this, "" + response.getError().getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "" + response.getError().getMessage(),
+                        Toast.LENGTH_LONG).show();
             }
         }
-
     }
 
     private void initializeUser(String user_id) {
+        System.out.println("initializeUser");
         sendNotificationTokenToServer(user_id);
 
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/get-user-by-id?";
@@ -125,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
                         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
                         url += "register-device-id?uid=" + user_id + "&device_id=" + token;
 
-                        new OutgoingRequestFetcher(LoginActivity.this).execute(url);
+                        new OutgoingRequest(LoginActivity.this).execute(url);
                     }
                 });
     }
@@ -137,15 +146,6 @@ public class LoginActivity extends AppCompatActivity {
 
         private String address;
 
-        /**
-         * Initialize a new UserFetcher, which runs in the given context.
-         *
-         * @param context The context in which this UserFetcher runs.
-         */
-        UserFetcher(Activity context) {
-            super(context);
-        }
-
         UserFetcher(Activity context, String idToken) { super(context, idToken); }
 
         /**
@@ -156,12 +156,12 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<String> rawJsons) {
             JSONObject userData = createJSONObject(rawJsons.get(0));
-            final AppCompatActivity context = (AppCompatActivity) super.getActivityWeakReference().get();
+            final AppCompatActivity context = (AppCompatActivity) getActivityWeakReference().get();
 
             final Intent switchToBottomNavigationView = new Intent(context,
                     BottomNavigationActivity.class);
 
-            getActivityWeakReference().get().finish();
+            context.finish();
 
             try {
                 putUserInfo(userData, context, switchToBottomNavigationView);
@@ -208,7 +208,6 @@ public class LoginActivity extends AppCompatActivity {
             final String[] personas = {"Customer", "Driver", "Supplier"};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivityWeakReference().get());
-            builder.setTitle("Please select a persona:");
             builder.setItems(personas, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int personaSelection) {
@@ -244,18 +243,16 @@ public class LoginActivity extends AppCompatActivity {
          * @param email the email address of the user being stored in the database.
          * @param address the address of the user being stored in the database.
          */
-        private void saveUserInfo(String id, String type, String name, String email, @Nullable String address) {
-            String urlStr = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id="
+        private void saveUserInfo(String id, String type, String name, String email,
+                                  @Nullable String address) {
+            System.out.println("saveUserInfo");
+            String url = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id="
                     + id + "&type=" + type + "&name=" + name + "&email=" + email;
             if (address != null) {
-                urlStr += "&address=" + address;
+                url += "&address=" + address;
             }
-            try {
-                URL url = new URL(urlStr);
-                url.openConnection();
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
+
+            new OutgoingRequest(getActivityWeakReference().get()).execute(url);
         }
 
         /**

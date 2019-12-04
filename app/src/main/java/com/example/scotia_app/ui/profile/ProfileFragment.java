@@ -40,14 +40,14 @@ public class ProfileFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LocalBroadcastManager.getInstance(this.requireActivity()).registerReceiver(notificationHandler,
-                new IntentFilter(getString(R.string.notification_intent_filter)));
+                new IntentFilter(getString(R.string.notification_received)));
     }
 
     @Override
     public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this.requireActivity()).registerReceiver(notificationHandler,
-                new IntentFilter(getString(R.string.notification_intent_filter)));
+                new IntentFilter(getString(R.string.notification_received)));
     }
 
     @Override

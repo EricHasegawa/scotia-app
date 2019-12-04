@@ -46,7 +46,7 @@ public class Invoice implements Parcelable  {
     public Invoice (JSONObject invoiceData) {
         try {
             this.id = invoiceData.getString("invoice_id");
-            this.displayId = invoiceData.getString("invoice_id_short");
+            this.displayId = "#" + invoiceData.getString("invoice_id_short");
             this.customerName = invoiceData.getString("customer_name");
             this.supplierName = invoiceData.getString("supplier_name");
             this.driverName = invoiceData.getString("driver_name");

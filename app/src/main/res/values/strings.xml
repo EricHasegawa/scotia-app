@@ -3,7 +3,8 @@
 <!--General-->
     <string name="app_name">RTP</string>
     <string name="package_name">com.example.scotia_app</string>
-    <string name="notification_intent_filter">com.example.scotia_app-NOTIFICATION</string>
+    <string name="notification_received">com.example.scotia_app-NOTIFICATION-RECEIVED</string>
+    <string name="notification_token_updated">com.example.scotia_app-NOTIFICATION-TOKEN_UPDATED</string>
 
 <!--Bottom Navigation Activity-->
     <string name="title_activity_bottom_navigation">Bottom Navigation Activity</string>

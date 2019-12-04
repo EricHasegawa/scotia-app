@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
-import com.example.scotia_app.OutgoingRequestFetcher;
+import com.example.scotia_app.database.OutgoingRequest;
 import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.data.model.Persona;
 import com.example.scotia_app.data.model.Status;
@@ -46,13 +46,17 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             alertDialog.show();
         }
     };
+    private BroadcastReceiver notificationTokenUpdatedHandler = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String url = intent.getStringExtra("url");
+            new OutgoingRequest(DetailedInvoiceActivity.this).execute(url);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(notificationHandler,
-                new IntentFilter(getString(R.string.notification_intent_filter)));
 
         this.invoice = getIntent().getParcelableExtra("invoice");
         this.user = getIntent().getParcelableExtra("user");
@@ -70,13 +74,16 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(notificationHandler,
-                new IntentFilter(getString(R.string.notification_intent_filter)));
+                new IntentFilter(getString(R.string.notification_received)));
+        LocalBroadcastManager.getInstance(this).registerReceiver(notificationTokenUpdatedHandler,
+                new IntentFilter(getString(R.string.notification_token_updated)));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationHandler);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationTokenUpdatedHandler);
     }
 
     // Displays all of the detailed invoice information via textViews.
@@ -85,7 +92,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         statusTextView.setText(invoice.getStatus().toString());
 
         TextView invoiceIdTextView = findViewById(R.id.invoiceId);
-        invoiceIdTextView.append("Invoice ID: " + invoice.getDisplayId());
+        invoiceIdTextView.append(invoice.getDisplayId());
 
         TextView customerIdTextView = findViewById(R.id.customerId);
         customerIdTextView.append("Customer: " + invoice.getCustomerName());
@@ -106,8 +113,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         ordersHeaderTextView.append("Orders:");
 
         TextView ordersTextView = findViewById(R.id.orders);
-        ArrayList<String> orders = new ArrayList<String>();
-        orders =invoice.getOrders();
+        ArrayList<String> orders = invoice.getOrders();
         for (int i = 0; i < orders.size(); i++) {
             ordersTextView.append("- " + orders.get(i) + "\n");
         }
@@ -131,7 +137,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     private void setToolbarTitle() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Invoice #" + invoice.getDisplayId());
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Invoice " + invoice.getDisplayId());
     }
 
     private void configureBackButton() {
@@ -176,7 +182,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private void confirmPendingOrPayment(View view) {
         if (invoice.getStatus() == Status.ISSUED) {
-            new OutgoingRequestFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PENDING));
+            new OutgoingRequest(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PENDING));
             Snackbar.make(view, "This order has now been confirmed as PENDING.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             TextView status = findViewById(R.id.status);
@@ -188,7 +194,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     }
 
     private void confirmPayment(View view) {
-        new OutgoingRequestFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PAID));
+        new OutgoingRequest(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.PAID));
         Snackbar.make(view, "This order has now been confirmed as PAID.", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         TextView status = findViewById(R.id.status);
@@ -203,7 +209,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             Snackbar.make(view, "This order has not been paid for yet.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         } else {
-            new OutgoingRequestFetcher(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.DELIVERED));
+            new OutgoingRequest(DetailedInvoiceActivity.this).execute(invoice.setStatusUrl(Status.DELIVERED));
             Snackbar.make(view, "This order has now been confirmed as DELIVERED.",
                     Snackbar.LENGTH_LONG).setAction("Action", null).show();
             TextView status = findViewById(R.id.status);

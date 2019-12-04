@@ -28,6 +28,7 @@ import com.example.scotia_app.data.model.User;
 import com.example.scotia_app.ui.invoices.DetailedInvoiceActivity;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.json.*;
 
@@ -44,7 +45,7 @@ public class NotificationsFragment extends Fragment {
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            loadNotifications(getView());
+            loadNotifications(Objects.requireNonNull(getView()));
 
             String title = intent.getStringExtra("title");
             String message = intent.getStringExtra("message");

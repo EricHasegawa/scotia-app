@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,8 +19,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.User;
+import com.example.scotia_app.database.OutgoingRequest;
 
 public class ProfileFragment extends Fragment {
+
+    User user;
 
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
@@ -65,10 +69,19 @@ public class ProfileFragment extends Fragment {
         final TextView textView = root.findViewById(R.id.text_profile);
         if (bundle != null) {
             textView.clearComposingText();
-            User user = bundle.getParcelable("user");
-            assert user != null;
+            user = bundle.getParcelable("user");
             textView.append("Hello, " + user.getName() + "!");
         }
+
+        Button orderButton = root.findViewById(R.id.button);
+        orderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
+                url += "generate-random-invoice?id=" + user.getId();
+                new OutgoingRequest(getActivity()).execute(url);
+            }
+        });
 
         return root;
     }

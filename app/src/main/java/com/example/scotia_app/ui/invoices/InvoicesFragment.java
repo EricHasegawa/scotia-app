@@ -43,6 +43,8 @@ public class InvoicesFragment extends Fragment {
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            loadInvoices(Filter.upcoming, getView());
+
             String title = intent.getStringExtra("title");
             String message = intent.getStringExtra("message");
 

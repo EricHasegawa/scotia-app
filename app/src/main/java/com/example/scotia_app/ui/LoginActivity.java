@@ -71,7 +71,6 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<GetTokenResult> task) {
                             if (task.isSuccessful()) {
                                 idToken = task.getResult().getToken();
-                                System.out.println(idToken);
                                 initializeUser(user.getUid());
                             }
                         }
@@ -104,7 +103,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initializeUser(String user_id) {
-        System.out.println("initializeUser");
         sendNotificationTokenToServer(user_id);
 
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/get-user-by-id?";
@@ -245,7 +243,6 @@ public class LoginActivity extends AppCompatActivity {
          */
         private void saveUserInfo(String id, String type, String name, String email,
                                   @Nullable String address) {
-            System.out.println("saveUserInfo");
             String url = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id="
                     + id + "&type=" + type + "&name=" + name + "&email=" + email;
             if (address != null) {

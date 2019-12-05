@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scotia_app.database.DataFetcher;
 import com.example.scotia_app.data.model.Filter;
@@ -27,6 +29,7 @@ import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.Status;
 import com.example.scotia_app.data.model.User;
+import com.example.scotia_app.ui.notifications.NotificationsFragment;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -36,9 +39,9 @@ import org.json.*;
 
 public class InvoicesFragment extends Fragment {
 
-    private User user;
-    private Long lastTimeUserClicked = null;
-    private Long clickTime;
+    private static User user;
+    private static Long lastTimeUserClicked = null;
+    private static Long clickTime;
     private static final int UPCOMING = 1;
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
@@ -79,7 +82,11 @@ public class InvoicesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_invoices, container, false);
-        showDetailed(root);
+
+        RecyclerView invoicesList = root.findViewById(R.id.invoices_list);
+        invoicesList.setLayoutManager(new LinearLayoutManager(getContext()));
+
+//        showDetailed(root);
         configureTab(root);
         return root;
     }
@@ -113,11 +120,11 @@ public class InvoicesFragment extends Fragment {
     }
 
     private void loadInvoices(Filter filter, View root) {
-        final ListView listView = root.findViewById(R.id.invoices_list);
+        final RecyclerView invoicesList = root.findViewById(R.id.invoices_list);
         TextView textView = root.findViewById(R.id.textView_placeholder);
 
         textView.setText(null);
-        listView.setAdapter(null);
+        invoicesList.setAdapter(null);
 
         if (this.user != null) {
             InvoicesFetcher invoicesFetcher = new InvoicesFetcher(getActivity());
@@ -212,10 +219,10 @@ public class InvoicesFragment extends Fragment {
         }
 
         private void refreshInvoicesList(AppCompatActivity context) {
-            ListView listView = context.findViewById(R.id.invoices_list);
-            if (listView != null) {
+            RecyclerView invoicesList = context.findViewById(R.id.invoices_list);
+            if (invoicesList != null) {
                 InvoiceAdapter invoiceAdapter = new InvoiceAdapter(context);
-                listView.setAdapter(invoiceAdapter);
+                invoicesList.setAdapter(invoiceAdapter);
                 invoiceAdapter.notifyDataSetChanged();
             }
         }
@@ -237,40 +244,53 @@ public class InvoicesFragment extends Fragment {
         }
     }
 
-     // Allows invoices to be properly manipulated and displayed
-    private static class InvoiceAdapter extends BaseAdapter {
+    // Allows invoices to be properly manipulated and displayed
+    private static class InvoiceAdapter extends RecyclerView.Adapter<InvoiceViewHolder> {
 
-        private Context context;
+        private Activity context;
 
-        private InvoiceAdapter(Context context) {
+        private InvoiceAdapter(Activity context) {
             this.context = context;
         }
 
+        @NonNull
         @Override
-        public int getCount() {
-            return invoices.length();
+        public InvoiceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.invoice_layout, parent, false);
+            return new InvoiceViewHolder(view);
         }
 
         @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-        @SuppressLint({"ViewHolder"})
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            view = LayoutInflater.from(context).inflate(R.layout.invoice_layout, viewGroup, false);
-
+        public void onBindViewHolder(@NonNull InvoiceViewHolder holder, final int position) {
+            View view = holder.itemView;
             TextView textId = view.findViewById(R.id.textView_id);
             TextView textStatus = view.findViewById(R.id.textView_status);
 
+            if (position % 2 == 1) {
+                view.setBackgroundColor(context.getColor(R.color.white));
+            }
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickTime = System.currentTimeMillis();
+                    if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
+                        Intent showDetailedInvoice = new Intent(context, DetailedInvoiceActivity.class);
+                        try {
+                            Invoice invoice = new Invoice(invoices.getJSONObject(position));
+                            showDetailedInvoice.putExtra("invoice", invoice);
+                            showDetailedInvoice.putExtra("user", user);
+                            context.startActivity(showDetailedInvoice);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        lastTimeUserClicked = clickTime;
+                    }
+                }
+            });
+
             try {
-                JSONObject jsonObject = invoices.getJSONObject(i);
+                JSONObject jsonObject = invoices.getJSONObject(position);
                 String id = jsonObject.getString("invoice_id_short");
                 String status = jsonObject.getString("status");
 
@@ -290,8 +310,22 @@ public class InvoicesFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
 
-            return view;
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public int getItemCount() {
+            return invoices.length();
+        }
+    }
+
+    private static class InvoiceViewHolder extends RecyclerView.ViewHolder {
+        InvoiceViewHolder(@NonNull View itemView) {
+            super(itemView);
         }
     }
 }

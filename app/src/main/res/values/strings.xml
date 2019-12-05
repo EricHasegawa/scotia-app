@@ -26,4 +26,13 @@
     <string name="send_invoice">Send Invoice</string>
     <string name="profile_logout">Logout</string>
 
+<!--Detailed Activity Invoice-->
+    <string name="customerLabel">Customer</string>
+    <string name="driverLabel">Driver</string>
+    <string name="addressLabel">Address</string>
+    <string name="name">NAME</string>
+    <string name="quantity">QTY</string>
+    <string name="unit_price">UNIT PRICE</string>
+    <string name="total">TOTAL</string>
+
 </resources>

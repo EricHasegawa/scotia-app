@@ -15,17 +15,23 @@ import com.example.scotia_app.data.model.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.scotia_app.R;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class DetailedInvoiceActivity extends AppCompatActivity {
@@ -67,7 +73,8 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         configureBackButton();
         configureConfirmButton();
         updateProgressBar();
-        setTextViews();
+        updateTextViews();
+        configureOrders();
     }
 
     @Override
@@ -87,37 +94,24 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     }
 
     // Displays all of the detailed invoice information via textViews.
-    private void setTextViews() {
+    private void updateTextViews() {
         TextView statusTextView = findViewById(R.id.status);
         statusTextView.setText(invoice.getStatus().toString());
 
+        TextView supplierIdTextView = findViewById(R.id.supplier);
+        supplierIdTextView.setText(invoice.getSupplierName());
+
         TextView invoiceIdTextView = findViewById(R.id.invoiceId);
-        invoiceIdTextView.append(invoice.getDisplayId());
+        invoiceIdTextView.setText(invoice.getDisplayId());
 
-        TextView customerIdTextView = findViewById(R.id.customerId);
-        customerIdTextView.append("Customer: " + invoice.getCustomerName());
+        TextView customerIdTextView = findViewById(R.id.customer);
+        customerIdTextView.setText(invoice.getCustomerName());
 
-        TextView supplierIdTextView = findViewById(R.id.supplierId);
-        supplierIdTextView.append(invoice.getSupplierName());
-
-        TextView driverIdTextView = findViewById(R.id.driverId);
-        driverIdTextView.append("Driver: " + invoice.getDriverName());
-
-        TextView totalTextView = findViewById(R.id.total);
-        totalTextView.append("Total: " + invoice.getTotal());
+        TextView driverIdTextView = findViewById(R.id.driver);
+        driverIdTextView.setText(invoice.getDriverName());
 
         TextView addressTextView = findViewById(R.id.address);
-        addressTextView.append("Address: " + invoice.getAddress());
-
-        TextView ordersHeaderTextView = findViewById(R.id.ordersHeader);
-        ordersHeaderTextView.append("Orders:");
-
-        TextView ordersTextView = findViewById(R.id.orders);
-        ArrayList<String> orders = invoice.getOrders();
-        for (int i = 0; i < orders.size(); i++) {
-            ordersTextView.append("- " + orders.get(i) + "\n");
-        }
-
+        addressTextView.setText(invoice.getAddress());
     }
 
     private void updateProgressBar() {
@@ -134,6 +128,13 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         }
     }
 
+    private void configureOrders() {
+        RecyclerView ordersList = findViewById(R.id.orders_list);
+        ordersList.setLayoutManager(new LinearLayoutManager(this));
+        OrderAdapter orderAdapter = new OrderAdapter();
+        ordersList.setAdapter(orderAdapter);
+    }
+
     private void setToolbarTitle() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -141,7 +142,8 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
     }
 
     private void configureBackButton() {
-        FloatingActionButton backButton = findViewById(R.id.fab_back); {
+        FloatingActionButton backButton = findViewById(R.id.fab_back);
+        {
             backButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -151,35 +153,30 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         }
     }
 
-    // Allows users to confirm the states/status of a given delivery.
+    // Allows users to confirm the status of a given delivery.
     private void configureConfirmButton() {
         final FloatingActionButton confirmationButton = findViewById(R.id.fab_confirm);
-        boolean isIssued = user.getPersona() == Persona.supplier && invoice.getStatus() ==
+        final boolean isIssued = user.getPersona() == Persona.supplier && invoice.getStatus() ==
                 Status.ISSUED;
-        boolean isPending = (user.getPersona() == Persona.customer || user.getPersona() ==
+        final boolean isPending = (user.getPersona() == Persona.customer || user.getPersona() ==
                 Persona.supplier) && invoice.getStatus() == Status.PENDING;
-        boolean isPaid = user.getPersona() == Persona.driver &&
+        final boolean isPaid = user.getPersona() == Persona.driver &&
                 invoice.getStatus() == Status.PAID;
+        boolean shouldDisplayInvoice = (isIssued || isPending || isPaid);
 
-        if (isIssued) {
+        if (shouldDisplayInvoice) {
+            confirmationButton.show();
             confirmationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setStatus(Status.PENDING, view);
-                }
-            });
-        } else if (isPending) {
-            confirmationButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    setStatus(Status.PAID, view);
-                }
-            });
-        } else if (isPaid) {
-            confirmationButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    setStatus(Status.DELIVERED, view);
+                    if (isIssued) {
+                        invoice.setStatus(Status.PENDING);
+                    } else if (isPending) {
+                        invoice.setStatus(Status.PAID);
+                    } else {
+                        invoice.setStatus(Status.DELIVERED);
+                    }
+                    updateStatus(view);
                 }
             });
         } else {
@@ -187,12 +184,75 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         }
     }
 
-    private void setStatus(Status status, View view) {
-        new OutgoingRequest(this).execute(invoice.setStatusUrl(status));
-        Snackbar.make(view, "This order has now been confirmed as PENDING.",
-                Snackbar.LENGTH_LONG).setAction("Action", null).show();
-        TextView statusText = findViewById(R.id.status);
-        statusText.setText(status.toString());
+    private void updateStatus(View view) {
+        new OutgoingRequest(this).execute(invoice.getStatusSetterUrl());
+        Snackbar.make(view, "This order has now been confirmed as " +
+                invoice.getStatus().toString() + ".", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
         updateProgressBar();
+        updateTextViews();
+    }
+
+    // Allows orders to be properly manipulated and displayed
+    private class OrderAdapter extends RecyclerView.Adapter<OrderViewHolder> {
+
+        @NonNull
+        @Override
+        public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_layout, parent, false);
+            return new OrderViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
+            View background = holder.itemView;
+            TextView nameTextView = holder.itemView.findViewById(R.id.name);
+            TextView quantityTextView = holder.itemView.findViewById(R.id.quantity);
+            TextView unitPriceTextView = holder.itemView.findViewById(R.id.unit_price);
+            TextView totalPriceTextView = holder.itemView.findViewById(R.id.total_price);
+
+            if (position == 0) {
+                background.setBackgroundColor(getColor(R.color.black));
+                nameTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                nameTextView.setTextColor(getColor(R.color.white));
+                quantityTextView.setTextColor(getColor(R.color.white));
+                unitPriceTextView.setTextColor(getColor(R.color.white));
+                totalPriceTextView.setTextColor(getColor(R.color.white));
+            } else if (position == invoice.getOrders().size() + 1) {
+                background.setBackgroundColor(getColor(R.color.black));
+                unitPriceTextView.setTextColor(getColor(R.color.white));
+                unitPriceTextView.setText(getString(R.string.total));
+                totalPriceTextView.setTextColor(getColor(R.color.white));
+                totalPriceTextView.setText(invoice.getTotal());
+            } else {
+                if (position % 2 == 0) {
+                    background.setBackgroundColor(getColor(R.color.white));
+                }
+                Map<String, String> order = invoice.getOrders().get(position - 1);
+
+                nameTextView.setText(order.get("name"));
+                quantityTextView.setText(order.get("quantity"));
+                unitPriceTextView.setText(order.get("unit_price"));
+                totalPriceTextView.setText(order.get("total_price"));
+            }
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public int getItemCount() {
+            return invoice.getOrders().size() + 2;
+        }
+    }
+
+    private class OrderViewHolder extends RecyclerView.ViewHolder {
+
+        public OrderViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+
     }
 }

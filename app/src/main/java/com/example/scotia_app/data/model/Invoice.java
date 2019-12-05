@@ -8,6 +8,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Invoice implements Parcelable  {
 
@@ -19,7 +21,7 @@ public class Invoice implements Parcelable  {
     private Status status;
     private String total;
     private String address;
-    private ArrayList<String> orders;
+    private ArrayList<Map<String, String>> orders;
 
     /**
      * Create a new Invoice with the data in the given parcel.
@@ -36,7 +38,7 @@ public class Invoice implements Parcelable  {
         total = in.readString();
         address = in.readString();
         orders = new ArrayList<>();
-        in.readStringList(orders);
+        in.readList(orders, JSONObject.class.getClassLoader());
     }
 
     /** Create a new Invoice with the data in the given JSONObject.
@@ -53,10 +55,16 @@ public class Invoice implements Parcelable  {
             this.status = Status.valueOf(invoiceData.getString("status"));
             this.total = invoiceData.getString("total");
             this.address = invoiceData.getString("address");
-            JSONArray array = invoiceData.getJSONArray("orders");
+            JSONArray ordersJSON = invoiceData.getJSONArray("orders");
             orders = new ArrayList<>();
-            for (int i = 0; i < array.length(); i++) {
-                this.orders.add(array.getString(i));
+            for (int i = 0; i < ordersJSON.length(); i++) {
+                JSONObject order = ordersJSON.getJSONObject(i);
+                Map<String, String> map = new HashMap<>();
+                map.put("name", order.getString("name"));
+                map.put("quantity", order.getString("quantity"));
+                map.put("unit_price", order.getString("unit_price"));
+                map.put("total_price", order.getString("total_price"));
+                this.orders.add(map);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -99,7 +107,7 @@ public class Invoice implements Parcelable  {
         dest.writeString(status.toString());
         dest.writeString(total);
         dest.writeString(address);
-        dest.writeStringList(orders);
+        dest.writeList(orders);
     }
 
     public String getId() {
@@ -134,16 +142,18 @@ public class Invoice implements Parcelable  {
         return address;
     }
 
-    public ArrayList<String> getOrders() {
+    public ArrayList<Map<String, String>> getOrders() {
         return orders;
     }
 
-    public String setStatusUrl(Status status) {
-        this.status = status;
-
+    public String getStatusSetterUrl() {
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/update-invoice-status?";
         url += "id=" + getId() + "&status=" + status.toString();
 
         return url;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

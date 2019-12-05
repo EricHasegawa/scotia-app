@@ -1,6 +1,5 @@
 package com.example.scotia_app.ui.notifications;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -11,15 +10,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scotia_app.database.DataFetcher;
 import com.example.scotia_app.data.model.Invoice;
@@ -84,7 +82,10 @@ public class NotificationsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
-        configureShowDetailedInvoiceWhenTapped(root);
+
+        RecyclerView notificationsList = root.findViewById(R.id.notifications_list);
+        notificationsList.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
         loadNotifications(root);
         return root;
     }
@@ -96,38 +97,10 @@ public class NotificationsFragment extends Fragment {
         }
     }
 
-    /**
-     * Shows the Detailed Invoice Activity corresponding to the tapped Invoice
-     */
-    private void configureShowDetailedInvoiceWhenTapped(final View root) {
-        final ListView listView = root.findViewById(R.id.notifications_list);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                clickTime = System.currentTimeMillis();
-                if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
-                    try {
-                        String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
-                        url += "get-invoice?id=" +
-                                notifications.getJSONObject(position).getString("invoice_id");
-
-                        InvoiceFetcher invoiceFetcher = new InvoiceFetcher(getActivity());
-                        invoiceFetcher.showProgressBar();
-                        invoiceFetcher.execute(url);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    lastTimeUserClicked = clickTime;
-                }
-            }
-        });
-    }
-
     private void loadNotifications(View root) {
-        final ListView listView = root.findViewById(R.id.notifications_list);
+        final RecyclerView notificationsList = root.findViewById(R.id.notifications_list);
 
-        listView.setAdapter(null);
+        notificationsList.setAdapter(null);
         NotificationFetcher notificationFetcher = new NotificationFetcher(getActivity());
         notificationFetcher.showProgressBar();
         notificationFetcher.execute(user.getNotificationURL());
@@ -170,10 +143,10 @@ public class NotificationsFragment extends Fragment {
         }
 
         private void refreshInvoicesList(AppCompatActivity context) {
-            ListView listView = context.findViewById(R.id.notifications_list);
-            if (listView != null) {
+            RecyclerView notificationsList = context.findViewById(R.id.notifications_list);
+            if (notificationsList != null) {
                 NotificationAdapter notificationAdapter = new NotificationAdapter(context);
-                listView.setAdapter(notificationAdapter);
+                notificationsList.setAdapter(notificationAdapter);
                 notificationAdapter.notifyDataSetChanged();
             }
         }
@@ -203,8 +176,6 @@ public class NotificationsFragment extends Fragment {
             super(context);
         }
 
-        InvoiceFetcher(Activity context, String idToken) { super(context, idToken); }
-
         /**
          * After super.doInBackground is finished executing, store the JSONObjects corresponding to
          * the raw strings in rawJsons in invoices, and populate the ListView with formatted strings
@@ -224,36 +195,48 @@ public class NotificationsFragment extends Fragment {
         }
     }
 
-    private static class NotificationAdapter extends BaseAdapter {
+    // Allows notifications to be properly manipulated and displayed
+    private static class NotificationAdapter extends RecyclerView.Adapter<NotificationViewHolder> {
 
-        private Context context;
+        private Activity context;
 
-        private NotificationAdapter(Context context) {
+        private NotificationAdapter(Activity context) {
             this.context = context;
         }
 
+        @NonNull
         @Override
-        public int getCount() {
-            return notifications.length();
+        public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_layout, parent, false);
+            return new NotificationViewHolder(view);
         }
 
         @Override
-        public Object getItem(int i) {
-            return null;
-        }
+        public void onBindViewHolder(@NonNull NotificationViewHolder holder, final int position) {
+            View view = holder.itemView;
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickTime = System.currentTimeMillis();
+                    if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
+                        try {
+                            String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
+                            url += "get-invoice?id=" +
+                                    notifications.getJSONObject(position).getString("invoice_id");
 
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
+                            InvoiceFetcher invoiceFetcher = new InvoiceFetcher(context);
+                            invoiceFetcher.showProgressBar();
+                            invoiceFetcher.execute(url);
 
-        @SuppressLint({"ViewHolder"})
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        lastTimeUserClicked = clickTime;
+                    }
+                }
+            });
 
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            view = LayoutInflater.from(context).inflate(R.layout.notification_layout, viewGroup, false);
-
-            if (i % 2 == 0) {
+            if (position % 2 == 0) {
                 view.setBackgroundColor(context.getColor(R.color.white));
             } else {
                 view.setBackgroundColor(context.getColor(R.color.lightGray));
@@ -263,7 +246,7 @@ public class NotificationsFragment extends Fragment {
             TextView textStatus = view.findViewById(R.id.textView_date);
 
             try {
-                JSONObject jsonObject = notifications.getJSONObject(i);
+                JSONObject jsonObject = notifications.getJSONObject(position);
                 String id = jsonObject.getString("message");
                 String status = jsonObject.getString("date");
 
@@ -273,8 +256,22 @@ public class NotificationsFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
 
-            return view;
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public int getItemCount() {
+            return notifications.length();
+        }
+    }
+
+    private static class NotificationViewHolder extends RecyclerView.ViewHolder {
+        NotificationViewHolder(@NonNull View itemView) {
+            super(itemView);
         }
     }
 }

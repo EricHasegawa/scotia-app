@@ -144,7 +144,7 @@ public class BottomNavigationActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String newName = input.getText().toString();
                 newName = newName.replaceAll(" " , "%20");
-                new OutgoingRequest(context).execute("https://us-central1-scotiabank-app.cloudfunctions.net/update-username?id=" + firebaseUser.getUid() + "username=" + newName);
+                new OutgoingRequest(context).execute("https://us-central1-scotiabank-app.cloudfunctions.net/update-username?id=" + firebaseUser.getUid() + "&name=" + newName);
             }
         });
 

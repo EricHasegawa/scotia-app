@@ -1,6 +1,5 @@
 package com.example.scotia_app.ui.invoices;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -11,9 +10,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,7 +25,6 @@ import com.example.scotia_app.data.model.Invoice;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.Status;
 import com.example.scotia_app.data.model.User;
-import com.example.scotia_app.ui.notifications.NotificationsFragment;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -115,7 +110,7 @@ public class InvoicesFragment extends Fragment {
     private void setUser() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            this.user = bundle.getParcelable("user");
+            user = bundle.getParcelable("user");
         }
     }
 
@@ -126,37 +121,11 @@ public class InvoicesFragment extends Fragment {
         textView.setText(null);
         invoicesList.setAdapter(null);
 
-        if (this.user != null) {
+        if (user != null) {
             InvoicesFetcher invoicesFetcher = new InvoicesFetcher(getActivity());
             invoicesFetcher.showProgressBar();
             invoicesFetcher.execute(user.getInvoiceURL(filter));
         }
-    }
-
-    /**
-     * Shows the Detailed Invoice Activity corresponding to the tapped Invoice
-     */
-    private void showDetailed(View root) {
-        final ListView listView = root.findViewById(R.id.invoices_list);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                clickTime = System.currentTimeMillis();
-                if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
-                    Intent showDetailedInvoice = new Intent(getActivity(), DetailedInvoiceActivity.class);
-                    try {
-                        Invoice invoice = new Invoice(invoices.getJSONObject(position));
-                        showDetailedInvoice.putExtra("invoice", invoice);
-                        showDetailedInvoice.putExtra("user", user);
-                        startActivity(showDetailedInvoice);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    lastTimeUserClicked = clickTime;
-                }
-            }
-        });
     }
 
     private void configureTab(final View root) {

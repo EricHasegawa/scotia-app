@@ -15,8 +15,8 @@ import android.widget.EditText;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.User;
 import com.example.scotia_app.database.OutgoingRequest;
-import com.example.scotia_app.ui.invoices.DetailedInvoiceActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -153,7 +153,15 @@ public class BottomNavigationActivity extends AppCompatActivity {
     }
 
     public void sendInvoice(View view) {
-        new OutgoingRequest(this).execute("https://us-central1-scotiabank-app.cloudfunctions.net/generate-random-invoice");
+        new OutgoingRequest(this).execute("https://us-central1-scotiabank-app.cloudfunctions.net/generate-random-invoice?id=" + user.getId());
+    }
+
+    public void changePassword(View view) {
+        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email);
+
+        Snackbar.make(view, "You have been sent a password reset email!",
+                Snackbar.LENGTH_LONG).setAction("Action", null).show();
     }
 
 }

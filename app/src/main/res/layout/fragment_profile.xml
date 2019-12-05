@@ -5,46 +5,57 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/change_name_button"
-        android:layout_width="337dp"
+        android:id="@+id/change_name"
+        android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="37dp"
-        android:layout_marginEnd="37dp"
-        android:layout_marginBottom="529dp"
-        android:text="@string/profile_changename"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="64dp"
         android:onClick="changeNameDialog"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/profile_change_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.506" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/change_password"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="64dp"
+        android:onClick="changePassword"
+        android:text="@string/profile_change_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/change_name" />
+
+    <Button
+        android:id="@+id/generate_random_invoice"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="64dp"
+        android:onClick="sendInvoice"
+        android:text="@string/send_invoice"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/change_password" />
 
     <Button
         android:id="@+id/logout_button"
-        android:layout_width="337dp"
+        android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="37dp"
-        android:layout_marginTop="395dp"
-        android:layout_marginEnd="37dp"
-        android:layout_marginBottom="78dp"
-        android:text="@string/profile_logout"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="128dp"
         android:onClick="logout"
+        android:text="@string/profile_logout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="337dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="37dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="37dp"
-        android:text="@string/send_invoice"
-        android:onClick="sendInvoice"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/change_name_button" />
 </androidx.constraintlayout.widget.ConstraintLayout>

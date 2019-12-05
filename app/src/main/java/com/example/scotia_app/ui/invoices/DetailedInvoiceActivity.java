@@ -191,6 +191,10 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
                 .setAction("Action", null).show();
         updateProgressBar();
         updateTextViews();
+        if (!(user.getPersona() == Persona.supplier && invoice.getStatus() != Status.PENDING)) {
+            final FloatingActionButton confirmationButton = findViewById(R.id.fab_confirm);
+            confirmationButton.hide();
+        }
     }
 
     // Allows orders to be properly manipulated and displayed

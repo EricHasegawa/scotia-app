@@ -1,15 +1,19 @@
 package com.example.scotia_app.ui.profile;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,10 +24,14 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.User;
 import com.example.scotia_app.database.OutgoingRequest;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ProfileFragment extends Fragment {
 
     User user;
+
+
 
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
@@ -63,25 +71,6 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
-
-        // Sets the textview's text to the user's name if the user is not null
-        Bundle bundle = getArguments();
-        final TextView textView = root.findViewById(R.id.text_profile);
-        if (bundle != null) {
-            textView.clearComposingText();
-            user = bundle.getParcelable("user");
-            textView.append("Hello, " + user.getName() + "!");
-        }
-
-        Button orderButton = root.findViewById(R.id.button);
-        orderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
-                url += "generate-random-invoice?id=" + user.getId();
-                new OutgoingRequest(getActivity()).execute(url);
-            }
-        });
 
         return root;
     }

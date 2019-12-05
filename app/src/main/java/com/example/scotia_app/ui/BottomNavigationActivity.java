@@ -1,17 +1,24 @@
 package com.example.scotia_app.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.View;
+import android.widget.EditText;
 
 import com.example.scotia_app.R;
 import com.example.scotia_app.data.model.User;
 import com.example.scotia_app.database.OutgoingRequest;
 import com.example.scotia_app.ui.invoices.DetailedInvoiceActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +36,7 @@ import androidx.navigation.ui.NavigationUI;
 public class BottomNavigationActivity extends AppCompatActivity {
 
     private User user;
+
     private BroadcastReceiver notificationTokenUpdatedHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -112,4 +120,40 @@ public class BottomNavigationActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void logout(View view) {
+        Intent login = new Intent(this, LoginActivity.class);
+        startActivity(login);
+        FirebaseAuth.getInstance().signOut();
+        finish();
+    }
+
+    public void changeNameDialog(View view) {
+        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("Please enter your new display name: ");
+
+        final EditText input = new EditText(view.getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        final Activity context = this;
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = input.getText().toString();
+                newName = newName.replaceAll(" " , "%20");
+                new OutgoingRequest(context).execute("https://us-central1-scotiabank-app.cloudfunctions.net/update-username?id=" + firebaseUser.getUid() + "username=" + newName);
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void sendInvoice(View view) {
+        new OutgoingRequest(this).execute("https://us-central1-scotiabank-app.cloudfunctions.net/generate-random-invoice");
+    }
+
 }

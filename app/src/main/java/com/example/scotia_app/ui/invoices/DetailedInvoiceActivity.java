@@ -216,14 +216,14 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             TextView totalPriceTextView = holder.itemView.findViewById(R.id.total_price);
 
             if (position == 0) {
-                background.setBackgroundColor(getColor(R.color.black));
+                background.setBackgroundColor(getColor(R.color.tableRed));
                 nameTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 nameTextView.setTextColor(getColor(R.color.white));
                 quantityTextView.setTextColor(getColor(R.color.white));
                 unitPriceTextView.setTextColor(getColor(R.color.white));
                 totalPriceTextView.setTextColor(getColor(R.color.white));
             } else if (position == invoice.getOrders().size() + 1) {
-                background.setBackgroundColor(getColor(R.color.black));
+                background.setBackgroundColor(getColor(R.color.tableRed));
                 unitPriceTextView.setTextColor(getColor(R.color.white));
                 unitPriceTextView.setText(getString(R.string.total));
                 totalPriceTextView.setTextColor(getColor(R.color.white));

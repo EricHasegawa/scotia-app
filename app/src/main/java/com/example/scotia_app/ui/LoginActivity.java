@@ -40,6 +40,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -70,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                     .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                         public void onComplete(@NonNull Task<GetTokenResult> task) {
                             if (task.isSuccessful()) {
-                                idToken = task.getResult().getToken();
+                                idToken = Objects.requireNonNull(task.getResult()).getToken();
                                 initializeUser(user.getUid());
                             }
                         }
@@ -86,17 +87,17 @@ public class LoginActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                user.getIdToken(true)
+                Objects.requireNonNull(user).getIdToken(true)
                         .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                             public void onComplete(@NonNull Task<GetTokenResult> task) {
                                 if (task.isSuccessful()) {
-                                    idToken = task.getResult().getToken();
+                                    idToken = Objects.requireNonNull(task.getResult()).getToken();
                                     initializeUser(user.getUid());
                                 }
                             }
                         });
             } else {
-                Toast.makeText(this, "" + response.getError().getMessage(),
+                Toast.makeText(this, Objects.requireNonNull(Objects.requireNonNull(response).getError()).getMessage(),
                         Toast.LENGTH_LONG).show();
             }
         }
@@ -128,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
                         // Get new Instance ID token
-                        String token = task.getResult().getToken();
+                        String token = Objects.requireNonNull(task.getResult()).getToken();
                         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
                         url += "register-device-id?uid=" + user_id + "&device_id=" + token;
 
@@ -144,7 +145,9 @@ public class LoginActivity extends AppCompatActivity {
 
         private String address;
 
-        UserFetcher(Activity context, String idToken) { super(context, idToken); }
+        UserFetcher(Activity context, String idToken) {
+            super(context, idToken);
+        }
 
         /**
          * After super.doInBackground is finished executing, populate a user with the retrieved JSON
@@ -171,14 +174,14 @@ public class LoginActivity extends AppCompatActivity {
         /**
          * Add the currently signed in user's User object to the given Intent.
          *
-         * @param userData The JSONObject containing this user's data.
-         * @param context The context on which to switch to bottomNavView.
+         * @param userData      The JSONObject containing this user's data.
+         * @param context       The context on which to switch to bottomNavView.
          * @param bottomNavView The Intent to which the user's data is passed and is switched to
          * @throws JSONException if JSONObject contains no field "persona", possibly to network
-         * problems or a malformed URL.
+         *                       problems or a malformed URL.
          */
         private void putUserInfo(@Nullable JSONObject userData, Context context, Intent bottomNavView) throws JSONException {
-            switch (userData.getString("persona")) {
+            switch (Objects.requireNonNull(userData).getString("persona")) {
                 case "driver":
                     bottomNavView.putExtra("user", new Driver(userData));
                     break;
@@ -197,7 +200,7 @@ public class LoginActivity extends AppCompatActivity {
          * Open a dialog prompting the user to choose a persona type, then create an entry for them
          * and save it in the database.
          *
-         * @param context The context on which to switch to bottomNavView.
+         * @param context       The context on which to switch to bottomNavView.
          * @param bottomNavView The Intent to which the user's data is passed and is switched to
          * @throws NullPointerException if user has no display name
          */
@@ -211,18 +214,18 @@ public class LoginActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int personaSelection) {
                     switch (personaSelection) {
                         case 1:
-                            bottomNavView.putExtra("user", new Driver(user.getDisplayName(), user.getUid()));
+                            bottomNavView.putExtra("user", new Driver(Objects.requireNonNull(user).getDisplayName(), user.getUid()));
                             saveUserInfo(user.getUid(), "driver", user.getDisplayName(), user.getEmail(), null);
                             switchActivities(context, bottomNavView);
                             break;
                         case 2:
-                            bottomNavView.putExtra("user", new Supplier(user.getDisplayName(), user.getUid()));
+                            bottomNavView.putExtra("user", new Supplier(Objects.requireNonNull(user).getDisplayName(), user.getUid()));
                             saveUserInfo(user.getUid(), "supplier", user.getDisplayName(), user.getEmail(), null);
                             switchActivities(context, bottomNavView);
                             break;
                         case 0:
                         default:
-                            bottomNavView.putExtra("user", new Customer(user.getDisplayName(), user.getUid()));
+                            bottomNavView.putExtra("user", new Customer(Objects.requireNonNull(user).getDisplayName(), user.getUid()));
                             openAddressDialog(getActivityWeakReference().get(), bottomNavView);
                             break;
                     }
@@ -235,10 +238,10 @@ public class LoginActivity extends AppCompatActivity {
         /**
          * Store a user with the given id, persona type, name, email address, and address.
          *
-         * @param id the Uid of the user being stored in the database.
-         * @param type the persona type of the user being stored in the database.
-         * @param name the name of the user being stored in the database.
-         * @param email the email address of the user being stored in the database.
+         * @param id      the Uid of the user being stored in the database.
+         * @param type    the persona type of the user being stored in the database.
+         * @param name    the name of the user being stored in the database.
+         * @param email   the email address of the user being stored in the database.
          * @param address the address of the user being stored in the database.
          */
         private void saveUserInfo(String id, String type, String name, String email,
@@ -255,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
         /**
          * Show a spinner and start the given Intent.
          *
-         * @param context The context on which to switch to bottomNavView.
+         * @param context       The context on which to switch to bottomNavView.
          * @param bottonNavView The Intent to which the user's data is passed and is switched to
          */
         private void switchActivities(final Context context, final Intent bottonNavView) {
@@ -268,7 +271,7 @@ public class LoginActivity extends AppCompatActivity {
          * Open a dialog prompting the user to enter their address, then save an entry for them in
          * the database.
          *
-         * @param context context The context on which to switch to bottomNavView.
+         * @param context       context The context on which to switch to bottomNavView.
          * @param bottomNavView The Intent to which the user's data is passed and is switched to
          */
         private void openAddressDialog(final Context context, final Intent bottomNavView) {
@@ -284,7 +287,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     address = input.getText().toString();
-                    saveUserInfo(user.getUid(), "customer", user.getDisplayName(), user.getEmail(), address);
+                    saveUserInfo(Objects.requireNonNull(user).getUid(), "customer", user.getDisplayName(), user.getEmail(), address);
                     switchActivities(context, bottomNavView);
                 }
             });

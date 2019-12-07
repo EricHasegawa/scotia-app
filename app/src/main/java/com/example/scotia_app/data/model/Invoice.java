@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Represents a given invoice fetched from the backend.
  */
-public class Invoice implements Parcelable  {
+public class Invoice implements Parcelable {
 
     private String id;
     private String displayId;
@@ -44,11 +44,12 @@ public class Invoice implements Parcelable  {
         in.readList(orders, JSONObject.class.getClassLoader());
     }
 
-    /** Create a new Invoice with the data in the given JSONObject.
+    /**
+     * Create a new Invoice with the data in the given JSONObject.
      *
      * @param invoiceData The data of this Invoice.
      */
-    public Invoice (JSONObject invoiceData) {
+    public Invoice(JSONObject invoiceData) {
         try {
             this.id = invoiceData.getString("invoice_id");
             this.displayId = "#" + invoiceData.getString("invoice_id_short");
@@ -97,7 +98,7 @@ public class Invoice implements Parcelable  {
     /**
      * Passes the attributes of this Invoice into a parcel
      *
-     * @param dest The parcel to pass the attributes into
+     * @param dest  The parcel to pass the attributes into
      * @param flags Optional details about how the attributes should be passed
      */
     @Override

@@ -27,10 +27,11 @@ public abstract class User implements Parcelable {
         this.persona = Persona.valueOf(in.readString());
     }
 
-    /** Create a new User with the data in the given JSONObject.
+    /**
+     * Create a new User with the data in the given JSONObject.
      *
      * @param userData The data of this User.
-     * @param persona The persona of this User.
+     * @param persona  The persona of this User.
      */
     User(JSONObject userData, Persona persona) {
         try {
@@ -51,7 +52,7 @@ public abstract class User implements Parcelable {
     /**
      * Passes the attributes of the user into a parcel
      *
-     * @param dest The parcel to pass the attributes into
+     * @param dest  The parcel to pass the attributes into
      * @param flags Optional details about how the attributes should be passed
      */
     @Override

@@ -11,13 +11,15 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Objects;
+
 public class FirebaseNotificationService extends FirebaseMessagingService {
 
     private static final String TAG = "Notification Service";
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        String title = remoteMessage.getNotification().getTitle();
+        String title = Objects.requireNonNull(remoteMessage.getNotification()).getTitle();
         String message = remoteMessage.getNotification().getBody();
 
         Intent intent = new Intent(getString(R.string.notification_received));
@@ -45,6 +47,7 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
 
     /**
      * Sends this token to the database to make sure this user has the correct notification token
+     *
      * @param token: the notification token of this user's device
      */
     private void sendRegistrationToServer(String token) {

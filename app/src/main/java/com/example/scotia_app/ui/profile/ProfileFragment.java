@@ -22,8 +22,6 @@ import com.example.scotia_app.data.model.User;
 
 public class ProfileFragment extends Fragment {
 
-    private User user;
-
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -71,8 +69,8 @@ public class ProfileFragment extends Fragment {
     private void setUser(View root) {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            user = bundle.getParcelable("user");
-            if (user.getPersona() != Persona.customer) {
+            User user = bundle.getParcelable("user");
+            if (user != null && user.getPersona() != Persona.customer) {
                 Button button = root.findViewById(R.id.generate_random_invoice);
                 button.setVisibility(View.GONE);
             }

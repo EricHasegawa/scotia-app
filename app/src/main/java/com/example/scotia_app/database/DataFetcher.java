@@ -47,7 +47,7 @@ abstract public class DataFetcher extends DatabaseManager {
      * @param rawJson The raw json string to be parsed
      * @return A List of JSONObjects, each corresponding to a raw json string.
      */
-     protected JSONArray createJSONObjects(String rawJson) {
+    protected JSONArray createJSONObjects(String rawJson) {
         try {
             return new JSONArray(rawJson);
         } catch (org.json.JSONException e) {

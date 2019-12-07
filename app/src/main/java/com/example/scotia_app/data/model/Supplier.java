@@ -28,12 +28,14 @@ public class Supplier extends User implements Parcelable {
         super(userData, Persona.supplier);
     }
 
-    public Supplier(String name, String id) { super(name, id, Persona.supplier); }
+    public Supplier(String name, String id) {
+        super(name, id, Persona.supplier);
+    }
 
     /**
      * Passes the attributes of this Supplier into a parcel
      *
-     * @param dest The parcel to pass the attributes into
+     * @param dest  The parcel to pass the attributes into
      * @param flags Optional details about how the attributes should be passed
      */
     @Override

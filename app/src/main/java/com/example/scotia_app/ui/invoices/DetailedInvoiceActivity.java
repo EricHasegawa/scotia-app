@@ -30,9 +30,9 @@ import android.widget.TextView;
 
 import com.example.scotia_app.R;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 /**
  * Displays and manages a given detailed invoice.
  */
@@ -94,6 +94,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationHandler);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationTokenUpdatedHandler);
     }
+
     /**
      * Displays all of the detailed invoice information via textViews
      */
@@ -164,6 +165,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             });
         }
     }
+
     /**
      * Allows users to confirm the status of a given delivery.
      */
@@ -215,6 +217,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             confirmationButton.hide();
         }
     }
+
     /**
      * Allows orders to be properly manipulated and displayed
      */

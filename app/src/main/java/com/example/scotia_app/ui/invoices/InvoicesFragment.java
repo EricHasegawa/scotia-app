@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import org.json.*;
+
 /**
  * Handles the full list of invoices displayed to the user.
  */
@@ -43,7 +45,8 @@ public class InvoicesFragment extends Fragment {
     private BroadcastReceiver notificationHandler = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            loadInvoices(Filter.upcoming, getView());
+            if (getView() != null)
+                loadInvoices(Filter.upcoming, getView());
 
             String title = intent.getStringExtra("title");
             String message = intent.getStringExtra("message");
@@ -135,7 +138,11 @@ public class InvoicesFragment extends Fragment {
     private void configureTab(final View root) {
         final TabLayout tabLayout = root.findViewById(R.id.filter_tabs);
         Objects.requireNonNull(tabLayout.getTabAt(1)).select();
-        tabLayout.setBackgroundColor(getContext().getColor(R.color.white));
+        if (getContext() != null) {
+            tabLayout.setBackgroundColor(getContext().getColor(R.color.white));
+        } else {
+            tabLayout.setBackgroundColor(Color.WHITE);
+        }
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -148,10 +155,12 @@ public class InvoicesFragment extends Fragment {
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) { }
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
     }
 
@@ -190,9 +199,11 @@ public class InvoicesFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
         /**
          * Reloads the list of invoices to shows user any changes
-         * @param  context the specific activity to refresh
+         *
+         * @param context the specific activity to refresh
          */
         private void refreshInvoicesList(AppCompatActivity context) {
             RecyclerView invoicesList = context.findViewById(R.id.invoices_list);
@@ -257,7 +268,7 @@ public class InvoicesFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     clickTime = System.currentTimeMillis();
-                    if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
+                    if (lastTimeUserClicked == null || clickTime - lastTimeUserClicked > 1000) {
                         Intent showDetailedInvoice = new Intent(context, DetailedInvoiceActivity.class);
                         try {
                             Invoice invoice = new Invoice(invoices.getJSONObject(position));

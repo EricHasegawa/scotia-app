@@ -19,6 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.internal.api.FirebaseNoSignedInUserException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -143,8 +144,12 @@ public class BottomNavigationActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newName = input.getText().toString();
-                newName = newName.replaceAll(" " , "%20");
-                new OutgoingRequest(context).execute("https://us-central1-scotiabank-app.cloudfunctions.net/update-username?id=" + firebaseUser.getUid() + "&name=" + newName);
+                newName = newName.replaceAll(" ", "%20");
+                if (firebaseUser != null) {
+                    new OutgoingRequest(context).execute("https://us-central1-scotiabank-app.cloudfunctions.net/update-username?id=" + firebaseUser.getUid() + "&name=" + newName);
+                } else {
+                    new FirebaseNoSignedInUserException("No Firebase user signed in").printStackTrace();
+                }
             }
         });
 
@@ -157,7 +162,12 @@ public class BottomNavigationActivity extends AppCompatActivity {
     }
 
     public void changePassword(View view) {
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        String email = null;
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null)
+            email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        if (email == null)
+            email = "";
         FirebaseAuth.getInstance().sendPasswordResetEmail(email);
 
         Snackbar.make(view, "You have been sent a password reset email!",

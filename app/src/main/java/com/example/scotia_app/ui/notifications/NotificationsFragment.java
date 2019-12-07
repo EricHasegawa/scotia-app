@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import org.json.*;
+
 /**
  * Handles the control of notifications sent to users.
  */
@@ -148,7 +149,6 @@ public class NotificationsFragment extends Fragment {
          * Reloads the given list of invoices to be shown to user
          *
          * @param context the context in which the invoices exist
-         *
          */
         private void refreshInvoicesList(AppCompatActivity context) {
             RecyclerView notificationsList = context.findViewById(R.id.notifications_list);
@@ -164,7 +164,6 @@ public class NotificationsFragment extends Fragment {
          * Shows no notifications if none are present
          *
          * @param context The context in which notifications exist.
-         *
          */
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
@@ -235,7 +234,7 @@ public class NotificationsFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     clickTime = System.currentTimeMillis();
-                    if(lastTimeUserClicked==null || clickTime - lastTimeUserClicked > 1000) {
+                    if (lastTimeUserClicked == null || clickTime - lastTimeUserClicked > 1000) {
                         try {
                             String url = "http://us-central1-scotiabank-app.cloudfunctions.net/";
                             url += "get-invoice?id=" +

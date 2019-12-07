@@ -44,7 +44,7 @@ public class Customer extends User implements Parcelable {
     /**
      * Passes the attributes of this Customer into a parcel
      *
-     * @param dest The parcel to pass the attributes into
+     * @param dest  The parcel to pass the attributes into
      * @param flags Optional details about how the attributes should be passed
      */
     @Override

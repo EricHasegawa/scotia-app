@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import org.json.JSONObject;
 
+/**
+ * Supplier users represent companies that receive invoices/payments and deliver goods.
+ */
 public class Supplier extends User implements Parcelable {
 
     /**

@@ -31,7 +31,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import org.json.*;
-
+/**
+ * Handles the full list of invoices displayed to the user.
+ */
 public class InvoicesFragment extends Fragment {
 
     private static User user;
@@ -81,7 +83,6 @@ public class InvoicesFragment extends Fragment {
         RecyclerView invoicesList = root.findViewById(R.id.invoices_list);
         invoicesList.setLayoutManager(new LinearLayoutManager(getContext()));
 
-//        showDetailed(root);
         configureTab(root);
         return root;
     }
@@ -114,6 +115,9 @@ public class InvoicesFragment extends Fragment {
         }
     }
 
+    /**
+     * Fetches and saves the full list of invoices.
+     */
     private void loadInvoices(Filter filter, View root) {
         final RecyclerView invoicesList = root.findViewById(R.id.invoices_list);
         TextView textView = root.findViewById(R.id.textView_placeholder);
@@ -186,7 +190,10 @@ public class InvoicesFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-
+        /**
+         * Reloads the list of invoices to shows user any changes
+         * @param  context the specific activity to refresh
+         */
         private void refreshInvoicesList(AppCompatActivity context) {
             RecyclerView invoicesList = context.findViewById(R.id.invoices_list);
             if (invoicesList != null) {
@@ -196,6 +203,11 @@ public class InvoicesFragment extends Fragment {
             }
         }
 
+        /**
+         * If no invoices are to be delivered, display a default text.
+         *
+         * @param context the context that the invoices are stored in
+         */
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
 
@@ -213,7 +225,9 @@ public class InvoicesFragment extends Fragment {
         }
     }
 
-    // Allows invoices to be properly manipulated and displayed
+    /**
+     * Allows invoices to be properly manipulated and displayed
+     */
     private static class InvoiceAdapter extends RecyclerView.Adapter<InvoiceViewHolder> {
 
         private Activity context;

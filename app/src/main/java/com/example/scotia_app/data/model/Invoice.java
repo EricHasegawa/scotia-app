@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a given invoice fetched from the backend.
+ */
 public class Invoice implements Parcelable  {
 
     private String id;

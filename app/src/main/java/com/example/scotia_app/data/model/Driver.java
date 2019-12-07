@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import org.json.JSONObject;
 
+/**
+ * Driver users are drivers for the supplier who deliver orders.
+ */
 public class Driver extends User implements Parcelable {
 
     /**

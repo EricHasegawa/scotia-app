@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import org.json.*;
-
+/**
+ * Handles the control of notifications sent to users.
+ */
 public class NotificationsFragment extends Fragment {
 
     private static User user;
@@ -142,6 +144,12 @@ public class NotificationsFragment extends Fragment {
             }
         }
 
+        /**
+         * Reloads the given list of invoices to be shown to user
+         *
+         * @param context the context in which the invoices exist
+         *
+         */
         private void refreshInvoicesList(AppCompatActivity context) {
             RecyclerView notificationsList = context.findViewById(R.id.notifications_list);
             if (notificationsList != null) {
@@ -151,6 +159,13 @@ public class NotificationsFragment extends Fragment {
             }
         }
 
+
+        /**
+         * Shows no notifications if none are present
+         *
+         * @param context The context in which notifications exist.
+         *
+         */
         private void showPlaceholder(AppCompatActivity context) {
             TextView textView = context.findViewById(R.id.textView_placeholder);
 
@@ -195,7 +210,9 @@ public class NotificationsFragment extends Fragment {
         }
     }
 
-    // Allows notifications to be properly manipulated and displayed
+    /**
+     * Allows notifications to be properly manipulated and displayed
+     */
     private static class NotificationAdapter extends RecyclerView.Adapter<NotificationViewHolder> {
 
         private Activity context;

@@ -6,6 +6,9 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Customer users are small business who will place and pay for orders.
+ */
 public class Customer extends User implements Parcelable {
 
     private String address;

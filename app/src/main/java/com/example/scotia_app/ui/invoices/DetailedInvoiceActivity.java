@@ -33,7 +33,9 @@ import com.example.scotia_app.R;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
+/**
+ * Displays and manages a given detailed invoice.
+ */
 public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private Invoice invoice;
@@ -92,8 +94,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationHandler);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(notificationTokenUpdatedHandler);
     }
-
-    // Displays all of the detailed invoice information via textViews.
+    /**
+     * Displays all of the detailed invoice information via textViews
+     */
     private void updateTextViews() {
         TextView statusTextView = findViewById(R.id.status);
         statusTextView.setText(invoice.getStatus().toString());
@@ -114,6 +117,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         addressTextView.setText(invoice.getAddress());
     }
 
+    /**
+     * Updates the invoice progress bar to reflect the status of the order.
+     */
     private void updateProgressBar() {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         Status status = invoice.getStatus();
@@ -135,12 +141,18 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         ordersList.setAdapter(orderAdapter);
     }
 
+    /**
+     * Sets the title of the invoice with the unique ID
+     */
     private void setToolbarTitle() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Invoice " + invoice.getDisplayId());
     }
 
+    /**
+     * Allows the user to return to the previous page
+     */
     private void configureBackButton() {
         FloatingActionButton backButton = findViewById(R.id.fab_back);
         {
@@ -152,8 +164,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             });
         }
     }
-
-    // Allows users to confirm the status of a given delivery.
+    /**
+     * Allows users to confirm the status of a given delivery.
+     */
     private void configureConfirmButton() {
         final FloatingActionButton confirmationButton = findViewById(R.id.fab_confirm);
         final boolean isIssued = user.getPersona() == Persona.supplier && invoice.getStatus() ==
@@ -184,6 +197,12 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Allows the user to confirm a phase of the delivery has been completed, and the status
+     * is updated accordingly.
+     *
+     * @param view represents the view of the text model
+     */
     private void updateStatus(View view) {
         new OutgoingRequest(this).execute(invoice.getStatusSetterUrl());
         Snackbar.make(view, "This order has now been confirmed as " +
@@ -196,8 +215,9 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
             confirmationButton.hide();
         }
     }
-
-    // Allows orders to be properly manipulated and displayed
+    /**
+     * Allows orders to be properly manipulated and displayed
+     */
     private class OrderAdapter extends RecyclerView.Adapter<OrderViewHolder> {
 
         @NonNull
@@ -254,7 +274,7 @@ public class DetailedInvoiceActivity extends AppCompatActivity {
 
     private class OrderViewHolder extends RecyclerView.ViewHolder {
 
-        public OrderViewHolder(@NonNull View itemView) {
+        OrderViewHolder(@NonNull View itemView) {
             super(itemView);
         }
 

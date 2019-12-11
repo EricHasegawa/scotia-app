@@ -21,6 +21,10 @@ public class OutgoingRequest extends DatabaseManager {
         super(context);
     }
 
+    public OutgoingRequest(Activity context, String idToken) {
+        super(context, idToken);
+    }
+
     /**
      * After super.doInBackground is finished executing, log the result of this outgoing task.
      * This is the default for outgoing asynchronous tasks. If some task requires some action to be

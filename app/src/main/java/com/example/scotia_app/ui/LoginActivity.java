@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.scotia_app.data.model.Persona;
 import com.example.scotia_app.database.DataFetcher;
 import com.example.scotia_app.database.OutgoingRequest;
 import com.example.scotia_app.R;
@@ -72,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<GetTokenResult> task) {
                             if (task.isSuccessful()) {
                                 idToken = Objects.requireNonNull(task.getResult()).getToken();
-                                initializeUser(user.getUid());
+                                initializeUser(user.getUid(), LoginActivity.this);
                             }
                         }
                     });
@@ -92,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<GetTokenResult> task) {
                                 if (task.isSuccessful()) {
                                     idToken = Objects.requireNonNull(task.getResult()).getToken();
-                                    initializeUser(user.getUid());
+                                    createUserInfo();
                                 }
                             }
                         });
@@ -103,13 +104,13 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void initializeUser(String user_id) {
-        sendNotificationTokenToServer(user_id);
+    private static void initializeUser(String user_id, Activity loginActivity) {
+        sendNotificationTokenToServer(user_id, loginActivity);
 
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/get-user-by-id?";
         url += "id=" + user_id;
 
-        new UserFetcher(this, idToken).execute(url);
+        new UserFetcher(loginActivity, idToken).execute(url);
     }
 
     /**
@@ -117,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
      * the previous token had been compromised. Note that this is called when the InstanceID token
      * is initially generated so this is where you would retrieve the token.
      */
-    private void sendNotificationTokenToServer(final String user_id) {
+    private static void sendNotificationTokenToServer(final String user_id, final Activity loginActivity) {
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
@@ -133,17 +134,97 @@ public class LoginActivity extends AppCompatActivity {
                         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/";
                         url += "register-device-id?uid=" + user_id + "&device_id=" + token;
 
-                        new OutgoingRequest(LoginActivity.this).execute(url);
+                        new OutgoingRequest(loginActivity).execute(url);
                     }
                 });
+    }
+
+    /**
+     * Store a user with the given id, persona type, name, email address, and address.
+     *
+     * @param id      the Uid of the user being stored in the database.
+     * @param type    the persona type of the user being stored in the database.
+     * @param name    the name of the user being stored in the database.
+     * @param email   the email address of the user being stored in the database.
+     * @param address the address of the user being stored in the database.
+     */
+    private void saveUserInfo(String id, Persona type, String name, String email,
+                              @Nullable String address) {
+        String url = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id="
+                + id + "&type=" + type + "&name=" + name + "&email=" + email;
+
+        if (address != null) {
+            url += "&address=" + address;
+            url = url.replaceAll(" ", "%20");
+        }
+
+        new UserSaver(this, id, idToken).execute(url);
+    }
+
+    /**
+     * Open a dialog prompting the user to enter their address, then save an entry for them in
+     * the database.
+     */
+    private void openAddressDialog() {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Please enter your address: ");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String address = input.getText().toString();
+                if (user != null) {
+                    saveUserInfo(user.getUid(), Persona.customer, user.getDisplayName(),
+                            user.getEmail(), address);
+                }
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /**
+     * Open a dialog prompting the user to choose a persona type, then create an entry for them
+     * and save it in the database.
+     */
+    private void createUserInfo() {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final String[] personas = {"Customer", "Driver", "Supplier"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(personas, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int personaSelection) {
+                if (user != null) {
+                    switch (personaSelection) {
+                        case 1:
+                            saveUserInfo(user.getUid(), Persona.driver, user.getDisplayName(), user.getEmail(), null);
+                            break;
+                        case 2:
+                            saveUserInfo(user.getUid(), Persona.supplier, user.getDisplayName(), user.getEmail(), null);
+                            break;
+                        case 0:
+                        default:
+                            openAddressDialog();
+                            break;
+                    }
+                }
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     /**
      * Fetches and parses the attributes of the logged-in User.
      */
     static private class UserFetcher extends DataFetcher {
-
-        private String address;
 
         UserFetcher(Activity context, String idToken) {
             super(context, idToken);
@@ -160,14 +241,14 @@ public class LoginActivity extends AppCompatActivity {
             final AppCompatActivity context = (AppCompatActivity) getActivityWeakReference().get();
 
             final Intent switchToBottomNavigationView = new Intent(context,
-                    BottomNavigationActivity.class);
+                    MainActivity.class);
 
             context.finish();
 
             try {
                 putUserInfo(userData, context, switchToBottomNavigationView);
             } catch (JSONException | NullPointerException e) {
-                createUserInfo(context, switchToBottomNavigationView);
+                e.printStackTrace();
             }
         }
 
@@ -197,65 +278,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         /**
-         * Open a dialog prompting the user to choose a persona type, then create an entry for them
-         * and save it in the database.
-         *
-         * @param context       The context on which to switch to bottomNavView.
-         * @param bottomNavView The Intent to which the user's data is passed and is switched to
-         * @throws NullPointerException if user has no display name
-         */
-        private void createUserInfo(final Context context, final Intent bottomNavView) throws NullPointerException {
-            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            final String[] personas = {"Customer", "Driver", "Supplier"};
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivityWeakReference().get());
-            builder.setItems(personas, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int personaSelection) {
-                    switch (personaSelection) {
-                        case 1:
-                            bottomNavView.putExtra("user", new Driver(Objects.requireNonNull(user).getDisplayName(), user.getUid()));
-                            saveUserInfo(user.getUid(), "driver", user.getDisplayName(), user.getEmail(), null);
-                            switchActivities(context, bottomNavView);
-                            break;
-                        case 2:
-                            bottomNavView.putExtra("user", new Supplier(Objects.requireNonNull(user).getDisplayName(), user.getUid()));
-                            saveUserInfo(user.getUid(), "supplier", user.getDisplayName(), user.getEmail(), null);
-                            switchActivities(context, bottomNavView);
-                            break;
-                        case 0:
-                        default:
-                            bottomNavView.putExtra("user", new Customer(Objects.requireNonNull(user).getDisplayName(), user.getUid()));
-                            openAddressDialog(getActivityWeakReference().get(), bottomNavView);
-                            break;
-                    }
-                }
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        }
-
-        /**
-         * Store a user with the given id, persona type, name, email address, and address.
-         *
-         * @param id      the Uid of the user being stored in the database.
-         * @param type    the persona type of the user being stored in the database.
-         * @param name    the name of the user being stored in the database.
-         * @param email   the email address of the user being stored in the database.
-         * @param address the address of the user being stored in the database.
-         */
-        private void saveUserInfo(String id, String type, String name, String email,
-                                  @Nullable String address) {
-            String url = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id="
-                    + id + "&type=" + type + "&name=" + name + "&email=" + email;
-            if (address != null) {
-                url += "&address=" + address;
-            }
-
-            new OutgoingRequest(getActivityWeakReference().get()).execute(url);
-        }
-
-        /**
          * Show a spinner and start the given Intent.
          *
          * @param context       The context on which to switch to bottomNavView.
@@ -266,34 +288,29 @@ public class LoginActivity extends AppCompatActivity {
             spinner.setVisibility(View.GONE);
             context.startActivity(bottonNavView);
         }
+    }
+
+    /**
+     * If a new user is created, saves the users data and then calls user fetcher as though the user
+     * was pre-existing
+     */
+    static private class UserSaver extends OutgoingRequest {
+        private String user_id;
 
         /**
-         * Open a dialog prompting the user to enter their address, then save an entry for them in
-         * the database.
+         * Initialize a new OutgoingRequest, which runs in the given context.
          *
-         * @param context       context The context on which to switch to bottomNavView.
-         * @param bottomNavView The Intent to which the user's data is passed and is switched to
+         * @param context The context in which this OutgoingRequest runs.
          */
-        private void openAddressDialog(final Context context, final Intent bottomNavView) {
-            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivityWeakReference().get());
-            builder.setTitle("Please enter your address: ");
+        UserSaver(Activity context, String user_id, String idToken) {
+            super(context, idToken);
+            this.user_id = user_id;
+        }
 
-            final EditText input = new EditText(getActivityWeakReference().get());
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    address = input.getText().toString();
-                    saveUserInfo(Objects.requireNonNull(user).getUid(), "customer", user.getDisplayName(), user.getEmail(), address);
-                    switchActivities(context, bottomNavView);
-                }
-            });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
+        @Override
+        protected void onPostExecute(ArrayList<String> rawJsons) {
+            super.onPostExecute(rawJsons);
+            initializeUser(user_id, getActivityWeakReference().get());
         }
     }
 }

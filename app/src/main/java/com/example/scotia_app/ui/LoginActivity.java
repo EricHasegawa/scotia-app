@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<GetTokenResult> task) {
                                 if (task.isSuccessful()) {
                                     idToken = Objects.requireNonNull(task.getResult()).getToken();
-                                    createUserInfo();
+                                    initializeUser(user.getUid(), LoginActivity.this);
                                 }
                             }
                         });
@@ -148,8 +148,8 @@ public class LoginActivity extends AppCompatActivity {
      * @param email   the email address of the user being stored in the database.
      * @param address the address of the user being stored in the database.
      */
-    private void saveUserInfo(String id, Persona type, String name, String email,
-                              @Nullable String address) {
+    private static void saveUserInfo(String id, Persona type, String name, String email,
+                              @Nullable String address, Activity loginActivity) {
         String url = "https://us-central1-scotiabank-app.cloudfunctions.net/create-user?id="
                 + id + "&type=" + type + "&name=" + name + "&email=" + email;
 
@@ -158,19 +158,19 @@ public class LoginActivity extends AppCompatActivity {
             url = url.replaceAll(" ", "%20");
         }
 
-        new UserSaver(this, id, idToken).execute(url);
+        new UserSaver(loginActivity, id, idToken).execute(url);
     }
 
     /**
      * Open a dialog prompting the user to enter their address, then save an entry for them in
      * the database.
      */
-    private void openAddressDialog() {
+    private static void openAddressDialog(final Activity loginActivity) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(loginActivity);
         builder.setTitle("Please enter your address: ");
 
-        final EditText input = new EditText(this);
+        final EditText input = new EditText(loginActivity);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
@@ -180,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
                 String address = input.getText().toString();
                 if (user != null) {
                     saveUserInfo(user.getUid(), Persona.customer, user.getDisplayName(),
-                            user.getEmail(), address);
+                            user.getEmail(), address, loginActivity);
                 }
             }
         });
@@ -193,25 +193,25 @@ public class LoginActivity extends AppCompatActivity {
      * Open a dialog prompting the user to choose a persona type, then create an entry for them
      * and save it in the database.
      */
-    private void createUserInfo() {
+    private static void createUserInfo(final Activity loginActivity) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String[] personas = {"Customer", "Driver", "Supplier"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(loginActivity);
         builder.setItems(personas, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int personaSelection) {
                 if (user != null) {
                     switch (personaSelection) {
                         case 1:
-                            saveUserInfo(user.getUid(), Persona.driver, user.getDisplayName(), user.getEmail(), null);
+                            saveUserInfo(user.getUid(), Persona.driver, user.getDisplayName(), user.getEmail(), null, loginActivity);
                             break;
                         case 2:
-                            saveUserInfo(user.getUid(), Persona.supplier, user.getDisplayName(), user.getEmail(), null);
+                            saveUserInfo(user.getUid(), Persona.supplier, user.getDisplayName(), user.getEmail(), null, loginActivity);
                             break;
                         case 0:
                         default:
-                            openAddressDialog();
+                            openAddressDialog(loginActivity);
                             break;
                     }
                 }
@@ -238,17 +238,23 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<String> rawJsons) {
             JSONObject userData = createJSONObject(rawJsons.get(0));
-            final AppCompatActivity context = (AppCompatActivity) getActivityWeakReference().get();
 
-            final Intent switchToBottomNavigationView = new Intent(context,
-                    MainActivity.class);
+            // if user data exists in the database i.e. if this isn't the first sign-in
+            if (userData != null) {
+                final AppCompatActivity context = (AppCompatActivity) getActivityWeakReference().get();
 
-            context.finish();
+                final Intent switchToBottomNavigationView = new Intent(context,
+                        MainActivity.class);
 
-            try {
-                putUserInfo(userData, context, switchToBottomNavigationView);
-            } catch (JSONException | NullPointerException e) {
-                e.printStackTrace();
+                context.finish();
+
+                try {
+                    putUserInfo(userData, context, switchToBottomNavigationView);
+                } catch (JSONException | NullPointerException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                createUserInfo(getActivityWeakReference().get());
             }
         }
 
@@ -281,12 +287,12 @@ public class LoginActivity extends AppCompatActivity {
          * Show a spinner and start the given Intent.
          *
          * @param context       The context on which to switch to bottomNavView.
-         * @param bottonNavView The Intent to which the user's data is passed and is switched to
+         * @param bottomNavView The Intent to which the user's data is passed and is switched to
          */
-        private void switchActivities(final Context context, final Intent bottonNavView) {
+        private void switchActivities(final Context context, final Intent bottomNavView) {
             ProgressBar spinner = getActivityWeakReference().get().findViewById(R.id.progressBar);
             spinner.setVisibility(View.GONE);
-            context.startActivity(bottonNavView);
+            context.startActivity(bottomNavView);
         }
     }
 
